@@ -30,6 +30,18 @@ If a question does not make any sense, or is not factually coherent, explain why
 {ANSWER}"""
 }
 
+theirs_instructions = {
+    "coherence": "Compare the coherence of the two following summaries.",
+    "fluency": "Evaluate and compare the fluency of the two following summaries.",
+    "relevance": """Evaluate and compare how two summaries consistently follow the source text.
+A summary is relevant if it captures the main points from the article, without leaving out any crucial details or adding any unnecessary or inaccurate ones.
+A summary is more relevant if it uses the same or similar terms and expressions as the article.
+A summary is less relevant if it omits some of the key facts from the article, or if it introduces irrelevant information that is not supported by the article.""",
+    "consistency": """Evaluate and compare how two summary consistently follow the source text.
+A summary is consistent with the article if it faithfully reflects the main points, facts, and tone of the article.
+A summary is inconsistent if it introduces any errors, contradictions, or distortions of the original article."""
+}
+
 theirs_compare = """\
 {INSTRUCTION}
 
