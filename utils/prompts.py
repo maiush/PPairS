@@ -12,7 +12,7 @@ aspect_noun2adj = {
 On prompt formats:
 
 - we manually write down the prompt formats for models used, for clarity.
-- note that we've included BOS tokens too, so need to do so later!
+- note that we've included BOS tokens too, so no need to do so later!
 '''
 chat_templates = {
     "mistral": """<s>[INST] {INSTRUCTION} [/INST]{ANSWER}""",
