@@ -1,6 +1,3 @@
-from textwrap import dedent
-
-
 aspect_noun2adj = {
     "coherence": "coherent",
     "consistency": "consistent",
