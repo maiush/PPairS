@@ -98,3 +98,17 @@ Claim 2: {CLAIM2}
 
 Question: Which claim is more factually accurate / less ambiguous? \
 Responses must be a single choice."""
+
+
+'''
+IPCC-confidence classification in AR6.
+Using the ClimateX dataset: https://huggingface.co/datasets/rlacombe/ClimateX
+'''
+
+cx_template = """\
+Compare the confidence of the following two statements:
+
+Statement 1: {STATEMENT1}
+Statement 2: {STATEMENT2}
+
+Question: Which statement is expressed with higher confidence? Responses must be a single choice."""
