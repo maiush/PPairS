@@ -20,8 +20,8 @@ def free_mem(vars):
 
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", torch_dtype=t.float16, device_map="auto"); model.eval()
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
-tks_1 = tokenizer.convert_tokens_to_ids(["1", "Ġ1"])
-tks_2 = tokenizer.convert_tokens_to_ids(["2", "Ġ2"])
+tks_1 = tokenizer.convert_tokens_to_ids(["1"])
+tks_2 = tokenizer.convert_tokens_to_ids(["2"])
 
 topic = sys.argv[1]
 prompts = pd.read_json(f"{gdrive_path}/sciencefeedback/prompts/{topic}feedback_compare.jsonl", orient="records", lines=True)
