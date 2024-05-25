@@ -1,5 +1,5 @@
 '''
-Having generated prompt datasets in workbook 001, we want to create smaller datasets for testing.
+Having generated prompt datasets in build_prompts.py, we want to create smaller datasets for testing.
 
 Since we are looking at pairwise comparisons we will make two assumptions for shortening:
 - we don't need to take pairwise comparisons between a given summary and itself.
@@ -8,16 +8,18 @@ Since we are looking at pairwise comparisons we will make two assumptions for sh
 Note the latter summary is likely incorrect, or at least needs to be verified at some point.
 '''
 
-import os, sys; sys.path.append("../utils")
-from constants import *
+import os
+from pathlib import Path
+from dev.constants import gdrive_path
 import pandas as pd
 from tqdm import tqdm
 
 
+path = f"{gdrive_path}/benchmarks/prompts"
 for model in ["mistral", "llama2", "llama3"]:
-    files = [f for f in os.listdir(f"{gdrive_path}/prompts/{model}") if "score" not in f]
+    files = [f for f in os.listdir(f"{path}/{model}") if "score" not in f]
     for file in files:
-        df = pd.read_json(f"{gdrive_path}/prompts/{model}/{file}", orient="records", lines=True)
+        df = pd.read_json(f"{path}/{model}/{file}", orient="records", lines=True)
         ixs = []
         for article in tqdm(df["article_id"].unique(), desc=f"{model}:{file}"):
             subset = df.loc[df["article_id"]==article, :]
@@ -29,4 +31,5 @@ for model in ["mistral", "llama2", "llama3"]:
                 ixs.append(i)
                 pairs.append((id1, id2))
         df = df.loc[ixs]
-        df.to_json(f"{gdrive_path}/prompts_short/{model}/{file}", orient="records", lines=True)
+        Path(f"{path}_short/{model}").mkdir(parents=True, exist_ok=True)
+        df.to_json(f"{path}_short/{model}/{file}", orient="records", lines=True)

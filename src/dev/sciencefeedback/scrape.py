@@ -1,7 +1,17 @@
+'''
+To test domain-specialisation, we want to use the science.feedback website.
+
+We will scrape all claims on this website, and categorise their ratings into three classes:
+- incorrect
+- misleading
+- correct
+'''
+
+from dev.constants import gdrive_path
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from tqdm import tqdm, trange
+from tqdm import trange
 
 
 url = """https://science.feedback.org/reviews/?_pagination={PAGE}"""
@@ -66,4 +76,4 @@ for k, v in category_map_inverted.items():
 
 out["verdict"] = out["verdict"].apply(lambda x: category_map[x])
 out.drop_duplicates(inplace=True)
-out.to_json("sciencefeedback.jsonl", orient="records", lines=True)
+out.to_json(f"{gdrive_path}/sciencefeedback/sciencefeedback.jsonl", orient="records", lines=True)
