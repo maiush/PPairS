@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+src/PPairS/__init__.py
+src/PPairS/prompts.py
+src/PPairS.egg-info/PKG-INFO
+src/PPairS.egg-info/SOURCES.txt
+src/PPairS.egg-info/dependency_links.txt
+src/PPairS.egg-info/top_level.txt
