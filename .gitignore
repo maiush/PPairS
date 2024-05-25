@@ -1,3 +1,4 @@
-utils/constants.py
-*__pycache__
-workbook.ipynb
+*.pyc
+*.pt
+*.pickle
+*.pkl
