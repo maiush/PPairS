@@ -112,3 +112,19 @@ Statement 1: {STATEMENT1}
 Statement 2: {STATEMENT2}
 
 Question: Which statement is expressed with higher confidence? Responses must be a single choice."""
+
+
+'''
+IPCC-confidence classification w/ context.
+'''
+
+ipcc_template = """\
+Compare the confidence of the following two statements, considering their respective contexts:
+
+Context 1: {CONTEXT1}
+Statement 1: {STATEMENT1}
+
+Context 2: {CONTEXT2}
+Statement 2: {STATEMENT2}
+
+Question: Which statement is expressed with higher confidence? Responses must be a single choice."""
