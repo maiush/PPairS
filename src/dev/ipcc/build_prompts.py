@@ -48,10 +48,8 @@ for i in range(len(claims)):
             else: row.append(0.5)
             prompts.loc[len(prompts)] = row
             if len(prompts) == 10000:
-                outpath = f"{outpath}/{file}_prompts{file_counter}.jsonl"
-                prompts.to_json(outpath, orient="records", lines=True)
+                prompts.to_json(f"{outpath}/{file}_prompts{file_counter}.jsonl", orient="records", lines=True)
                 del prompts; gc.collect()
                 prompts = pd.DataFrame(columns=["C1", "C2", "S1", "S2", "prompt", "P(S1)"])
                 file_counter += 1
-outpath = f"{outpath}/{file}_prompts{file_counter}.jsonl"
-prompts.to_json(outpath, orient="records", lines=True)
+prompts.to_json(f"{outpath}/{file}_prompts{file_counter}.jsonl", orient="records", lines=True)
