@@ -4,6 +4,7 @@ HF_TOKEN = os.environ.get("HF_TOKEN")
 from dev.constants import gdrive_path
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from accelerate import Accelerator
 import torch as t
 import pandas as pd
 from tqdm import trange
@@ -19,11 +20,12 @@ def free_mem(vars):
 n_layer, d_model = 32, 4096
 
 
+accelerator = Accelerator()
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", 
                                              torch_dtype=t.float16, 
                                              device_map="auto",
                                              cache_dir="/gws/nopw/j04/ai4er/users/maiush/LLMs") 
-model.eval()
+model = accelerator.prepare(model); model.eval()
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 
 long_path = f"{gdrive_path}/ipcc/long"
@@ -38,7 +40,7 @@ if not os.path.exists(outpath):
     for i in trange(len(prompts)):
         prompt = f"{prompts.at[i, 'prompt']}{choice}"
         tks = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False).to(device)
-        with t.no_grad(): out = model(tks, output_hidden_states=True)
+        with t.inference_mode(): out = model(tks, output_hidden_states=True)
         activations[i] = out["hidden_states"][-1][0, -1, :].cpu()
         free_mem([tks, out])
     t.save(activations, outpath)
