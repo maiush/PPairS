@@ -33,8 +33,8 @@ class IPCCDataset(Dataset):
             f = file.replace('prompts', 'PART')
             choice1 = t.load(f"{path}/{f.replace('.jsonl', '_CHOICE1.pt')}", pickle_module=dill).to(self.device)
             choice2 = t.load(f"{path}/{f.replace('.jsonl', '_CHOICE2.pt')}", pickle_module=dill).to(self.device)
-            labels = t.from_numpy(labels["P(S1)"].values).to(choice1.dtype).to(device)
             ids = labels.apply(lambda row: [file[:3], row["S1"], row["S2"]], axis=1).tolist()
+            labels = t.from_numpy(labels["P(S1)"].values).to(choice1.dtype).to(device)
             if self.contrast:
                 self.cache_pos[file] = choice1
                 self.cache_neg[file] = choice2
