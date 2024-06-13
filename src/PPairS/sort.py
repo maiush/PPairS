@@ -13,6 +13,7 @@ def mergesort(
 ) -> List[int]:
     '''
     Perform either PairS-greedy (standard mergesort), or PairS-beam.
+    Sort into DESCENDING order: P(i >- j) > 0.5 => index(i) < index(j)
     '''
 
     # if using beam, we need all hyperparameters
