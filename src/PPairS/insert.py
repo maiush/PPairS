@@ -110,7 +110,7 @@ class InsertIPCC:
                 else: return self.insert(context, statement, mid+1, high)
         else:
             # this should never happen! if it does, something went wrong
-            return -1.
+            return (None, None)
 
     def test_statement(self, context: str, statement: str, statementID: str) -> float:
         context2, statement2 = self.get_context_and_statement(statementID)
