@@ -20,7 +20,7 @@ def free_mem(vars):
 models = {
     "llama2": "meta-llama/Llama-2-7b-chat-hf",
     "llama3": "meta-llama/Meta-Llama-3-8B-Instruct",
-    "mistral": "mistralai/Mistral-7B-v0.1"
+    "mistral": "mistralai/Mistral-7B-Instruct-v0.1"
 }
 aspects = ["coherence", "consistency", "fluency", "relevance"]
 
