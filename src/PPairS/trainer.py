@@ -1,5 +1,5 @@
 from PPairS.datasets import *
-from torch.utils.data import Subset, DataLoader
+from torch.utils.data import DataLoader
 from typing import Any, Tuple
 
 
@@ -14,12 +14,7 @@ class Trainer():
     ):
         self.dataset = dataset_class(**dataset_kwargs)
         # train/val/test split
-        trainval_split, valtest_split = int(splits[0]*len(self.dataset)), int(splits[1]*len(self.dataset))
-        # shuffle indices and create subsets
-        perm = t.randperm(len(self.dataset))
-        self.train_dataset = Subset(self.dataset, perm[:trainval_split])
-        self.val_dataset = Subset(self.dataset, perm[trainval_split:valtest_split])
-        self.test_dataset = Subset(self.dataset, perm[valtest_split:])
+        self.train_dataset, self.val_dataset, self.test_dataset = self.dataset.get_splits(splits)
         # dataloaders
         self.train_loader = DataLoader(self.train_dataset, batch_size=batch_size, shuffle=True)
         self.val_loader = DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False)
