@@ -18,10 +18,12 @@ src/dev/benchmarks/compare.py
 src/dev/benchmarks/contrast.py
 src/dev/benchmarks/process_data.py
 src/dev/benchmarks/prompts_subset.py
+src/dev/benchmarks/results.py
 src/dev/benchmarks/score.py
-src/dev/causal/harvest.py
 src/dev/climatex/build_prompts.py
 src/dev/climatex/contrast.py
+src/dev/climatex_full/embeddings.py
+src/dev/climatex_full/parsepdf.py
 src/dev/ipcc/build_prompts.py
 src/dev/ipcc/claims.py
 src/dev/ipcc/claims_AR1AR2.py
@@ -31,7 +33,8 @@ src/dev/ipcc/harvest.py
 src/dev/ipcc/probe_scaling.py
 src/dev/ipcc/probe_scaling_halfblind.py
 src/dev/ipcc/probe_scaling_notblind.py
-src/dev/ipcc_binary_search/train_classifier.py
+src/dev/ipcc_tagging/classifier.py
+src/dev/ipcc_tagging/prompts.py
 src/dev/sciencefeedback/build_prompts.py
 src/dev/sciencefeedback/compare.py
 src/dev/sciencefeedback/contrast.py
