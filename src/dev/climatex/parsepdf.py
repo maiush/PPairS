@@ -4,6 +4,7 @@ from pypdf import PdfReader
 import nltk
 from nltk import sent_tokenize
 import pandas as pd
+from timeout_decorator import timeout, TimeoutError
 from tqdm import tqdm, trange
 
 
@@ -112,18 +113,28 @@ def acronyms(text: str) -> str:
             replaced_acronyms.add(acronym)
     return text
 
+@timeout(30)
+def extract_text(page):
+    return page.extract_text()
 
-path = f"{gdrive_path}/climatex_full/pdf"
+
+path = f"{gdrive_path}/climatex/pdf"
 files = os.listdir(path)
 
 
 for file in files:
     id_root = file.replace(".pdf", "").replace("_", "")
-    if os.path.exists(f"{gdrive_path}/climatex_full/claims/{id_root}_processed.jsonl"): continue
+    if os.path.exists(f"{gdrive_path}/climatex/claims/{id_root}_processed.jsonl"): continue
 
     print(file)
     reader = PdfReader(f"{path}/{file}")
-    pages = [page.extract_text() for page in tqdm(reader.pages, desc="reading pages")]
+    pages = []
+    for page in tqdm(reader.pages, desc="reading pages"):
+        try:
+            text = extract_text(page)
+            pages.append(text)
+        except:
+            continue
     pages = [process_page(page) for page in tqdm(pages, desc="preprocessing pages")]
     sentences = []
     for page in tqdm(pages, desc="extracting sentences"):
@@ -135,7 +146,7 @@ for file in files:
         match = re.match(confidence_tag, sentences[ix])
         if match:
             claim, _, tag = match.groups()[:3]
-            context = " ".join(sentences[ix-2:ix] + [claim] + sentences[ix+1:ix+3])
+            context = " ".join(sentences[ix-5:ix] + [claim] + sentences[ix+1:ix+6])
             claims.loc[len(claims)] = [context, claim, tag.replace(" ", "_")]
 
     claims["context"] = claims["context"].apply(lambda x: acronyms(clean_text(x)))
@@ -144,5 +155,5 @@ for file in files:
 
     ids = [f"{id_root}{i+1}" for i in range(len(claims))]
     claims["statementID"] = ids
-    claims.to_json(f"{gdrive_path}/climatex_full/claims/{id_root}_processed.jsonl", orient="records", lines=True)
+    claims.to_json(f"{gdrive_path}/climatex/claims/{id_root}_processed.jsonl", orient="records", lines=True)
     print("-"*50)

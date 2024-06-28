@@ -1,14 +1,12 @@
 import os, sys, gc
-
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import gdrive_path
 
+from dev.constants import gdrive_path
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from accelerate import Accelerator
 import torch as t
 import pandas as pd
 from tqdm import trange
-
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 device = t.device("cuda")
@@ -20,6 +18,10 @@ def free_mem(vars):
 n_layer, d_model = 32, 4096
 
 
+i = int(sys.argv[1])
+prompts = pd.read_json(f"{gdrive_path}/climatex/prompts/AR{i}.jsonl", orient="records", lines=True)
+
+# load llm
 accelerator = Accelerator()
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", 
                                              torch_dtype=t.float16, 
@@ -28,19 +30,16 @@ model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruc
 model = accelerator.prepare(model); model.eval()
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 
-long_path = f"{gdrive_path}/ipcc/long"
-spm_path = f"{gdrive_path}/ipcc/summary"
-file, type, ix, choice = sys.argv[1:5]
-path = long_path if type == "long" else spm_path
-prompts = pd.read_json(f"{path}/prompts/{file}_prompts{ix}.jsonl", orient="records", lines=True)
-
-outpath = f"{path}/activations/{file}_PART{ix}_CHOICE{choice}.pt"
+# harvest activations
+choice = int(sys.argv[2])
+outpath = f"{gdrive_path}/climatex/activations/AR{i}_{choice}.pt"
 if not os.path.exists(outpath):
     activations = t.zeros(len(prompts), d_model)
     for i in trange(len(prompts)):
-        prompt = f"{prompts.at[i, 'prompt']}{choice}"
-        tks = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False).to(device)
-        with t.inference_mode(): out = model(tks, output_hidden_states=True)
+        pair = []
+        prompt = f"{prompts.at[i, "prompt"]}{choice}"
+        tks = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
+        with t.inference_mode(): out = model(tks, output_hidden_states=True)            
         activations[i] = out["hidden_states"][-1][0, -1, :].cpu()
         free_mem([tks, out])
     t.save(activations, outpath)
