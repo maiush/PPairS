@@ -2,7 +2,7 @@ import os, sys, gc
 from pathlib import Path
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch as t
@@ -30,9 +30,9 @@ tokenizer = AutoTokenizer.from_pretrained(models[model_name])
 tk_scores = [tokenizer.encode(str(i), add_special_tokens=False)[0] for i in range(1, 6)]
 print(model_name)
 dataset = sys.argv[2]
-prompts = pd.read_json(f"{gdrive_path}/benchmarks/prompts/{model_name}/{dataset}_score.jsonl", orient="records", lines=True)
+prompts = pd.read_json(f"{data_storage}/benchmarks/prompts/{model_name}/{dataset}_score.jsonl", orient="records", lines=True)
 for aspect in aspects:
-    outpath = f"{gdrive_path}/benchmarks/scores/{model_name}"
+    outpath = f"{data_storage}/benchmarks/scores/{model_name}"
     Path(outpath).mkdir(parents=True, exist_ok=True)
     if os.path.exists(f"{outpath}/{dataset}_{aspect}.jsonl"): continue
 

@@ -1,5 +1,5 @@
 import dill
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 import torch as t
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -8,10 +8,10 @@ from random import sample
 
 cache, data = [], []
 for report in ["AR3", "AR4", "AR5", "AR6"]:
-    x1 = t.load(f"{gdrive_path}/climatex/activations/{report}_1.pt", pickle_module=dill)
-    x2 = t.load(f"{gdrive_path}/climatex/activations/{report}_2.pt", pickle_module=dill)
+    x1 = t.load(f"{data_storage}/climatex/activations/{report}_1.pt", pickle_module=dill)
+    x2 = t.load(f"{data_storage}/climatex/activations/{report}_2.pt", pickle_module=dill)
     cache.append(x1-x2)
-    df = pd.read_json(f"{gdrive_path}/climatex/prompts/{report}.jsonl", orient="records", lines=True)
+    df = pd.read_json(f"{data_storage}/climatex/prompts/{report}.jsonl", orient="records", lines=True)
     data.append(df)
 x1, x2 = x1 - x1.mean(dim=0), x2 - x2.mean(dim=0)
 x = t.concat(cache)

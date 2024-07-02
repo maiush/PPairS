@@ -1,4 +1,4 @@
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from PPairS.prompts import chat_templates, fc_template_score, fc_template_compare
 
 from pathlib import Path
@@ -17,7 +17,7 @@ for topic in ["Climate", "Health", "Energy"]:
         "Correct": 1
     }
 
-    path = f"{gdrive_path}/sciencefeedback/sciencefeedback.jsonl"
+    path = f"{data_storage}/sciencefeedback/sciencefeedback.jsonl"
     df = pd.read_json(path, orient="records", lines=True)
     # we sample a maximum of 100 claims to limit dataset size
     cv = df.loc[df["topic"] == topic, ["topic", "claim", "verdict"]].values[:min(100, len(df))]
@@ -34,7 +34,7 @@ for topic in ["Climate", "Health", "Energy"]:
             ANSWER="The above claim is "
         )
         prompts.loc[len(prompts)] = [id, topic, claim, verdict, prompt]
-    outpath = f"{gdrive_path}/sciencefeedback/prompts"
+    outpath = f"{data_storage}/sciencefeedback/prompts"
     Path(outpath).mkdir(parents=True, exist_ok=True)
     prompts.to_json(f"{outpath}/{topic.lower()}feedback_score.jsonl", orient="records", lines=True)
 

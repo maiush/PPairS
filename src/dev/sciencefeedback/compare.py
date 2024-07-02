@@ -2,7 +2,7 @@ import os, sys, gc
 from pathlib import Path
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch as t
@@ -24,9 +24,9 @@ tks_1 = tokenizer.convert_tokens_to_ids(["1"])
 tks_2 = tokenizer.convert_tokens_to_ids(["2"])
 
 topic = sys.argv[1]
-prompts = pd.read_json(f"{gdrive_path}/sciencefeedback/prompts/{topic}feedback_compare.jsonl", orient="records", lines=True)
+prompts = pd.read_json(f"{data_storage}/sciencefeedback/prompts/{topic}feedback_compare.jsonl", orient="records", lines=True)
 
-outpath = f"{gdrive_path}/sciencefeedback/logits"
+outpath = f"{data_storage}/sciencefeedback/logits"
 Path(outpath).mkdir(parents=True, exist_ok=True)
 if not os.path.exists(f"{outpath}/{topic}feedback.jsonl"):
     p_s1, p_s2 = [], []
