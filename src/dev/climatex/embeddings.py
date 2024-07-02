@@ -1,6 +1,6 @@
 import os, gc
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 import torch as t
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from accelerate import Accelerator
@@ -26,7 +26,7 @@ model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B",
 model = accelerator.prepare(model); model.eval()
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
 
-path = f"{gdrive_path}/climatex/claims"
+path = f"{data_storage}/climatex/claims"
 files = os.listdir(path)
 
 for file in files:
@@ -40,6 +40,6 @@ for file in files:
         with t.inference_mode(): out = model(tks, output_hidden_states=True)
         activations[i] = out["hidden_states"][-1][0, -1, :].cpu()
         free_mem([tks, out])
-    outpath = f"{gdrive_path}/climatex/embeddings/{file.split('_')[0]}.pt"
+    outpath = f"{data_storage}/climatex/embeddings/{file.split('_')[0]}.pt"
     t.save(activations, outpath)
     free_mem([activations])

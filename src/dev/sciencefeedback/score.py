@@ -2,7 +2,7 @@ import os, sys, gc
 from pathlib import Path
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch as t
@@ -24,8 +24,8 @@ answers = ["incorrect", "misleading", "correct"]
 tk_answers = [tokenizer.encode(x, add_special_tokens=False)[0] for x in answers]
 
 topic = sys.argv[1]
-prompts = pd.read_json(f"{gdrive_path}/sciencefeedback/prompts/{topic}feedback_score.jsonl", orient="records", lines=True)
-outpath = f"{gdrive_path}/sciencefeedback/scores"
+prompts = pd.read_json(f"{data_storage}/sciencefeedback/prompts/{topic}feedback_score.jsonl", orient="records", lines=True)
+outpath = f"{data_storage}/sciencefeedback/scores"
 Path(outpath).mkdir(parents=True, exist_ok=True)
 if not os.path.exists(f"{outpath}/{topic}feedback.jsonl"):
     verdicts = []

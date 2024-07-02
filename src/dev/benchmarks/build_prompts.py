@@ -1,4 +1,4 @@
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from PPairS.prompts import chat_templates, aspect_noun2adj, bm_instructions, bm_theirs_compare, bm_theirs_score, bm_mine_compare
 
 import pandas as pd
@@ -85,11 +85,11 @@ answer_mine = lambda aspect, choice: f"Between Choice 1 and Choice 2, the more {
 for dataset in ["summeval", "newsroom"]:
     for model in ["mistral", "llama2", "llama3"]:
 
-        path = f"{gdrive_path}/benchmarks/data/{dataset}-processed.jsonl"
+        path = f"{data_storage}/benchmarks/data/{dataset}-processed.jsonl"
         summaries = pd.read_json(path, orient="records", lines=True)
 
         # pairwise comparisons
-        outpath = f"{gdrive_path}/benchmarks/prompts/{model}"
+        outpath = f"{data_storage}/benchmarks/prompts/{model}"
         Path(outpath).mkdir(parents=True, exist_ok=True)
 
         chat_template = chat_templates[model]

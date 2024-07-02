@@ -1,7 +1,7 @@
 import os, sys, gc
 HF_TOKEN = os.environ.get("HF_TOKEN")
 
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from accelerate import Accelerator
 import torch as t
@@ -19,7 +19,7 @@ n_layer, d_model = 32, 4096
 
 
 i = int(sys.argv[1])
-prompts = pd.read_json(f"{gdrive_path}/climatex/prompts/AR{i}.jsonl", orient="records", lines=True)
+prompts = pd.read_json(f"{data_storage}/climatex/prompts/AR{i}.jsonl", orient="records", lines=True)
 
 # load llm
 accelerator = Accelerator()
@@ -32,7 +32,7 @@ tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 
 # harvest activations
 choice = int(sys.argv[2])
-outpath = f"{gdrive_path}/climatex/activations/AR{i}_{choice}.pt"
+outpath = f"{data_storage}/climatex/activations/AR{i}_{choice}.pt"
 if not os.path.exists(outpath):
     activations = t.zeros(len(prompts), d_model)
     for i in trange(len(prompts)):

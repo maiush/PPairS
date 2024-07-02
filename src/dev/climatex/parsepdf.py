@@ -1,5 +1,5 @@
 import os, dill, re
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from pypdf import PdfReader
 import nltk
 from nltk import sent_tokenize
@@ -118,13 +118,13 @@ def extract_text(page):
     return page.extract_text()
 
 
-path = f"{gdrive_path}/climatex/pdf"
+path = f"{data_storage}/climatex/pdf"
 files = os.listdir(path)
 
 
 for file in files:
     id_root = file.replace(".pdf", "").replace("_", "")
-    if os.path.exists(f"{gdrive_path}/climatex/claims/{id_root}_processed.jsonl"): continue
+    if os.path.exists(f"{data_storage}/climatex/claims/{id_root}_processed.jsonl"): continue
 
     print(file)
     reader = PdfReader(f"{path}/{file}")
@@ -155,5 +155,5 @@ for file in files:
 
     ids = [f"{id_root}{i+1}" for i in range(len(claims))]
     claims["statementID"] = ids
-    claims.to_json(f"{gdrive_path}/climatex/claims/{id_root}_processed.jsonl", orient="records", lines=True)
+    claims.to_json(f"{data_storage}/climatex/claims/{id_root}_processed.jsonl", orient="records", lines=True)
     print("-"*50)

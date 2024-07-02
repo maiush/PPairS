@@ -1,5 +1,5 @@
 import sys
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from PPairS.sort import mergesort
 import numpy as np
 import pandas as pd
@@ -15,13 +15,13 @@ from tqdm import tqdm, trange
 
 def train_probe(model: str, dataset: str, aspect: str, split: float=0.5) -> Tuple[np.ndarray]:
     # load activations
-    act_path = f"{gdrive_path}/benchmarks/activations/{model}/{dataset}_{aspect}"
+    act_path = f"{data_storage}/benchmarks/activations/{model}/{dataset}_{aspect}"
     x_pos = t.load(f"{act_path}_1.pt")
     x_neg = t.load(f"{act_path}_2.pt")
     x = t.concat([x_pos - x_neg, x_neg - x_pos])
 
     # load labels and mapping to IDs
-    probe_prompts_path = f"{gdrive_path}/benchmarks/prompts_short/{model}/{dataset}_mine_1.jsonl"
+    probe_prompts_path = f"{data_storage}/benchmarks/prompts_short/{model}/{dataset}_mine_1.jsonl"
     prompts = pd.read_json(probe_prompts_path, orient="records", lines=True)
     id2ix = prompts.apply(lambda row: [row["article_id"], row["summary_id"][0], row["summary_id"][1]], axis=1).to_list()
     id2ix = np.concatenate([np.array(id2ix), np.array([(a, s2, s1) for (a, s1, s2) in id2ix])])
@@ -55,10 +55,10 @@ def collect_results(model: str, dataset: str, aspect: str) -> pd.DataFrame:
     results = pd.DataFrame(columns=["articleID", "S1", "S2", "true", "direct-scoring", "logits", "probe"])
 
     # load scores
-    scores_path = f"{gdrive_path}/benchmarks/scores/{model}/{dataset}_{aspect}.jsonl"
+    scores_path = f"{data_storage}/benchmarks/scores/{model}/{dataset}_{aspect}.jsonl"
     scores = pd.read_json(scores_path, orient="records", lines=True)
     # load pairs method
-    logits_path = f"{gdrive_path}/benchmarks/_logits/{model}/{dataset}_{aspect}.jsonl"
+    logits_path = f"{data_storage}/benchmarks/_logits/{model}/{dataset}_{aspect}.jsonl"
     logits = pd.read_json(logits_path, orient="records", lines=True)
     logits["S1"] = logits["summary_id"].apply(lambda x: x[0])
     logits["S2"] = logits["summary_id"].apply(lambda x: x[1])
@@ -114,7 +114,7 @@ def get_U(P):
 
 def get_spearman(model: str, dataset: str, aspect: str, results: pd.DataFrame) -> dict:
     # load scores
-    scores_path = f"{gdrive_path}/benchmarks/scores/{model}/{dataset}_{aspect}.jsonl"
+    scores_path = f"{data_storage}/benchmarks/scores/{model}/{dataset}_{aspect}.jsonl"
     scores = pd.read_json(scores_path, orient="records", lines=True)
 
     correlations_ds, correlations_lgt, correlations_prb = [], [], []

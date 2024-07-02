@@ -10,12 +10,12 @@ Note the latter summary is likely incorrect, or at least needs to be verified at
 
 import os
 from pathlib import Path
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 import pandas as pd
 from tqdm import tqdm
 
 
-path = f"{gdrive_path}/benchmarks/prompts"
+path = f"{data_storage}/benchmarks/prompts"
 for model in ["mistral", "llama2", "llama3"]:
     files = [f for f in os.listdir(f"{path}/{model}") if "score" not in f]
     for file in files:

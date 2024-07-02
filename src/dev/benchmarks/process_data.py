@@ -7,12 +7,12 @@ To ease further experiments, we want to preprocess the SummEval and News Room da
 - extract average summary scores from human raters
 '''
 
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 import pandas as pd
 
 
 # SummEval
-path = f"{gdrive_path}/benchmarks/data/summeval"
+path = f"{data_storage}/benchmarks/data/summeval"
 df = pd.read_json(f"{path}/model_annotations.aligned.paired.jsonl", orient="records", lines=True)
 out = pd.DataFrame(columns=["article_id", "model_id", "article", "summary", "coherence", "consistency", "fluency", "relevance"])
 for article_id in df["id"].unique():
@@ -30,10 +30,10 @@ for article_id in df["id"].unique():
             row.append(avg_score)
         out.loc[len(out)] = row
 out.rename(columns={"model_id": "summary_id"}, inplace=True)
-out.to_json(f"{gdrive_path}/benchmarks/data/summeval-processed.jsonl", orient="records", lines=True)
+out.to_json(f"{data_storage}/benchmarks/data/summeval-processed.jsonl", orient="records", lines=True)
 
 # News Room
-path = f"{gdrive_path}/benchmarks/data/newsroom"
+path = f"{data_storage}/benchmarks/data/newsroom"
 df = pd.read_csv(f"{path}/newsroom-human-eval.csv")
 df.drop(columns=["ArticleTitle"], inplace=True)
 column_mapping = {
@@ -61,4 +61,4 @@ for article in df.article_id.unique():
             row[col] = ratings[col].mean()
         out.loc[len(out)] = row
 out.rename(columns={"system_id": "summary_id"}, inplace=True)
-out.to_json(f"{gdrive_path}/benchmarks/data/newsroom-processed.jsonl", orient="records", lines=True)
+out.to_json(f"{data_storage}/benchmarks/data/newsroom-processed.jsonl", orient="records", lines=True)

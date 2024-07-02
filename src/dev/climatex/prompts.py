@@ -1,22 +1,22 @@
 import os
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 from PPairS.prompts import chat_templates, ipcc_template
 import pandas as pd
 
 
 # choose 250 random claims from AR6 to compare them against
-files = [f for f in os.listdir(f"{gdrive_path}/climatex/claims") if "AR6" in f]
+files = [f for f in os.listdir(f"{data_storage}/climatex/claims") if "AR6" in f]
 ar6_data = []
-for file in files: ar6_data.append(pd.read_json(f"{gdrive_path}/climatex/claims/{file}", orient="records", lines=True))
+for file in files: ar6_data.append(pd.read_json(f"{data_storage}/climatex/claims/{file}", orient="records", lines=True))
 ar6_data = pd.concat(ar6_data)
 ar6_data = ar6_data.sample(n=min(250, len(ar6_data)))
 
 # for each of AR3, AR4, AR5, choose 100 random claims
 for i in range(3, 7):
     report = f"AR{i}"
-    files = [f for f in os.listdir(f"{gdrive_path}/climatex/claims") if report in f]
+    files = [f for f in os.listdir(f"{data_storage}/climatex/claims") if report in f]
     data = []
-    for file in files: data.append(pd.read_json(f"{gdrive_path}/climatex/claims/{file}", orient="records", lines=True))
+    for file in files: data.append(pd.read_json(f"{data_storage}/climatex/claims/{file}", orient="records", lines=True))
     data = pd.concat(data)
     if i == 6:
         ar6_ids = ar6_data["statementID"].unique()
@@ -47,4 +47,4 @@ for i in range(3, 7):
             if tags.index(t1) > tags.index(t2): true = 1.
             if tags.index(t1) < tags.index(t2): true = 0.
             prompts.loc[len(prompts)] = [id1, id2, prompt, true]
-    prompts.to_json(f"{gdrive_path}/climatex/prompts/AR{i}.jsonl", orient="records", lines=True)
+    prompts.to_json(f"{data_storage}/climatex/prompts/AR{i}.jsonl", orient="records", lines=True)

@@ -7,7 +7,7 @@ We will scrape all claims on this website, and categorise their ratings into thr
 - correct
 '''
 
-from dev.constants import gdrive_path
+from dev.constants import data_storage
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -76,4 +76,4 @@ for k, v in category_map_inverted.items():
 
 out["verdict"] = out["verdict"].apply(lambda x: category_map[x])
 out.drop_duplicates(inplace=True)
-out.to_json(f"{gdrive_path}/sciencefeedback/sciencefeedback.jsonl", orient="records", lines=True)
+out.to_json(f"{data_storage}/sciencefeedback/sciencefeedback.jsonl", orient="records", lines=True)
