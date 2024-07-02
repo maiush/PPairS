@@ -36,11 +36,11 @@ aspect_noun2adj = {
 bm_instructions = {
     "coherence": "Compare the coherence of the two following summaries.",
     "fluency": "Evaluate and compare the fluency of the two following summaries.",
-    "relevance": """Evaluate and compare how two summaries consistently follow the source text.
+    "relevance": """Evaluate the relevance of the following summaries.
 A summary is relevant if it captures the main points from the article, without leaving out any crucial details or adding any unnecessary or inaccurate ones.
 A summary is more relevant if it uses the same or similar terms and expressions as the article.
 A summary is less relevant if it omits some of the key facts from the article, or if it introduces irrelevant information that is not supported by the article.""",
-    "consistency": """Evaluate and compare how two summary consistently follow the source text.
+    "consistency": """Evaluate and compare how two summaries consistently follow the source text.
 A summary is consistent with the article if it faithfully reflects the main points, facts, and tone of the article.
 A summary is inconsistent if it introduces any errors, contradictions, or distortions of the original article."""
 }
@@ -98,20 +98,6 @@ Claim 2: {CLAIM2}
 
 Question: Which claim is more factually accurate / less ambiguous? \
 Responses must be a single choice."""
-
-
-'''
-IPCC-confidence classification in AR6.
-Using the ClimateX dataset: https://huggingface.co/datasets/rlacombe/ClimateX
-'''
-
-cx_template = """\
-Compare the confidence of the following two statements:
-
-Statement 1: {STATEMENT1}
-Statement 2: {STATEMENT2}
-
-Question: Which statement is expressed with higher confidence? Responses must be a single choice."""
 
 
 '''
