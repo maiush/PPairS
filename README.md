@@ -13,21 +13,58 @@ Large Language Models (LLM's) are capable automatic evaluators, highly suited fo
 ```
 PPairS/
 ├── src/           
-│    ├── dev
-│    │    ├── benchmarks/       # text evaluation benchmarks - Experiment 1
-│    │    ├── sciencefeedback/  # fact checking - Experiment 2
-│    │    └── climatex/         # assessing expert confidence in climate science - Experiment 3
-│    └── PPairS                 # core of PPairS - including prompt templates and sorting  
-├── README.md                   # project overview and instructions
-├── pyproject.toml              # config file for the PPairS package
-└── thesis.pdf                  # mres dissertation introducing this work
+│   ├── dev
+│   │   ├── benchmarks/       # text evaluation benchmarks - Experiment 1
+│   │   ├── sciencefeedback/  # fact checking - Experiment 2
+│   │   └── climatex/         # assessing expert confidence in climate science - Experiment 3
+│   └── PPairS                # core of PPairS - including prompt templates and sorting  
+├── README.md                 # project overview and instructions
+├── pyproject.toml            # config file for the PPairS package
+└── thesis.pdf                # mres dissertation introducing this work
 ```
 
 ## Data
 
-TODO
+For a replication of our results, our original data sources are:
+- Text Evaluation Benchmarks (**Experiment 1**):
+  - NEWSROOM: [paper](https://aclanthology.org/N18-1065/), [dataset](https://lil.nlp.cornell.edu/newsroom/index.html)
+  - SummEval: [paper](https://arxiv.org/abs/2007.12626), [dataset](https://github.com/Yale-LILY/SummEval)
+- Fact-Checking (**Experiment 2**):
+  - Science Feedback: [home page](https://science.feedback.org/)
+- Expert Confidence (**Experiment 3**):
+  - IPCC - Reports: [all reports](https://www.ipcc.ch/reports/)
+
+Alternatively visit our project archive on [Zenodo]().
+This archive has the following structure:
+```
+PPairS/
+├── benchmarks/
+│   ├── data/                  # downloaded NEWSROOM and SummEval datasets
+│   ├── prompts/               # prompts for three LLM's, two datasets - PairS (_theirs) and PPairS (_mine)
+│   ├── scores/                # outputs of direct-scoring
+│   ├── logits/                # outputs of logit comparison (PairS)
+│   └── activations/           # contrast pair activations (PPairS)
+├── sciencefeedback/
+│   ├── sciencefeedback.jsonl  # all scraped and tagged claims from https://science.feedback.org/ 
+│   ├── prompts/               # prompts used for direct-scoring (_score), PairS (_compare), and PPairS (_contrast)
+│   ├── scores/                # outputs of direct-scoring
+│   ├── logits/                # outputs of logit comparison (PairS)
+│   └── activations/           # contrast pair activations (PPairS)
+└── climatex/
+    ├── pdf/                   # all IPCC working group and synthesis reports since the third assessment cycle
+    ├── claims/                # all scraped and preprocessed claims from the above pdf's
+    ├── embeddings/            # context embeddings for each above claim
+    ├── topics/                # results of topic modelling for each report
+    ├── prompts/               # prompts for each assessment cycle's reports
+    └── activations/           # contrast pair activations (PPairS)
+```
 
 ## Installation
+
+The main requirement for installation is Python >= 3.12.
+
+> [!NOTE]
+> PPairS has not been tested thoroughly with the newly release [numpy 2.0](https://numpy.org/devdocs/release/2.0.0-notes.html)
 
 1. Clone the repository:
   ```bash
@@ -84,7 +121,7 @@ This work was support by the [UKRI Centre for Doctoral Training in Application o
 
 ## Contact
 
-For any queries or information, contact [Sharan Maiya](maito:sm2783@cam.ac.uk).
+For any queries or information, contact [Sharan Maiya](mailto:sm2783@cam.ac.uk).
 
 ---
 
