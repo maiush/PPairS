@@ -1,8 +1,10 @@
 # PPairS: Pairwise Preference Search with Linear Probing
 
-[![DOI](https://zenodo.org/badge/777825592.svg)](TODO) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repository implements PPairS, introduced in [**Aligning Language Model Evaluators with Human Judgement**](TODO), a dissertation submitted for the degree of *Master of Research in Environmental Data Science*.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12627714.svg)](https://doi.org/10.5281/zenodo.12627714) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+This repository implements PPairS, introduced in [**Aligning Language Model Evaluators with Human Judgement**](thesis.pdf), a dissertation submitted for the degree of *Master of Research in Environmental Data Science*.
 
 ## Overview
 
@@ -34,7 +36,7 @@ For a replication of our results, our original data sources are:
 - Expert Confidence (**Experiment 3**):
   - IPCC - Reports: [all reports](https://www.ipcc.ch/reports/)
 
-Alternatively visit our project archive on [Zenodo]().
+Alternatively visit our project archive on [Zenodo](https://doi.org/10.5281/zenodo.12627714).
 This archive has the following structure:
 ```
 PPairS/
@@ -64,7 +66,7 @@ PPairS/
 The main requirement for installation is Python >= 3.12.
 
 > [!NOTE]
-> PPairS has not been tested thoroughly with the newly release [numpy 2.0](https://numpy.org/devdocs/release/2.0.0-notes.html)
+> PPairS has not been tested thoroughly with the newly released [numpy 2.0](https://numpy.org/devdocs/release/2.0.0-notes.html)
 
 1. Clone the repository:
   ```bash
@@ -78,11 +80,11 @@ The main requirement for installation is Python >= 3.12.
   conda activate ppairs
   ```
 
-3. [Optional - for replication] Download our experiment data [here](TODO):
+3. [Optional - for replication] Download our experiment data [here](https://doi.org/10.5281/zenodo.12627714):
   ```bash
-  wget <TODO>
-  unzip -qq <TODO>.zip
-  rm <TODO>.zip
+  wget https://zenodo.org/records/12627714/files/PPairS.zip
+  unzip -qq PPairS.zip
+  rm PPairS.zip
   ```
 
 4. Set up a path to your / our data (**important**):
