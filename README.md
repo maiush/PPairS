@@ -63,7 +63,7 @@ PPairS/
 
 ## Installation
 
-The main requirement for installation is Python >= 3.12.
+The main requirement for installation is Python >= 3.12. We strongly recommend a CUDA-enabled GPU for faster inference using LLM's. 
 
 > [!NOTE]
 > PPairS has not been tested thoroughly with the newly released [numpy 2.0](https://numpy.org/devdocs/release/2.0.0-notes.html)
