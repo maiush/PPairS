@@ -2,5 +2,4 @@
 *.pt
 *.pickle
 *.pkl
-data/
 src/dev/constants.py
