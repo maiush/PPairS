@@ -7,7 +7,7 @@ newsroom_descriptions = {
     "coherence": "In a coherent summary of an article the phrases and sentences fit together and make sense collectively."
 }
 
-newsroom_instruction_zero-shot = """\
+newsroom_instruction_zero_shot = """\
 Consider the following article and summary:
 Article: {ARTICLE}
 Summary: {SUMMARY}
@@ -31,7 +31,7 @@ summeval_descriptions = {
     "relevance": "Relevance is the selection of important content from a source. A relevant summary should include only important information from the source document."
 }
 
-summeval_instruction_zero-shot = """\
+summeval_instruction_zero_shot = """\
 Consider the following source and summary:
 Source: {ARTICLE}
 Summary: {SUMMARY}
@@ -57,17 +57,31 @@ hanna_descriptions = {
     "complexity": "A complex story is elaborate."
 }
 
-hanna_instruction_zero-shot = """\
+hanna_instruction_zero_shot = """\
 Consider the following prompt and story:
-Prompt: {ARTICLE}
-Story: {SUMMARY}
+Prompt: {PROMPT}
+Story: {STORY}
 {DESCRIPTION} Rate the {ASPECT} of this story from 1 to 5, where 1 represents very low {ASPECT}, \
 and 5 represents excellent {ASPECT}. Responses must be a single score."""
 
 hanna_instruction_contrast = """\
 Consider the following prompt:
-Prompt: {ARTICLE}
+Prompt: {PROMPT}
 Below are two stories inspired by the above prompt:
-Story 1: {SUMMARY1}
-Story 2: {SUMMARY2}
+Story 1: {STORY1}
+Story 2: {STORY2}
 {DESCRIPTION} Which story is more {ASPECT}? Responses must be a single choice."""
+
+
+# compiling all prompts into dictionaries for easy access
+
+descriptions = {
+    "newsroom": newsroom_descriptions,
+    "summeval": summeval_descriptions,
+    "hanna": hanna_descriptions
+}
+instructions = {
+    "newsroom": (newsroom_instruction_zero_shot, newsroom_instruction_contrast),
+    "summeval": (summeval_instruction_zero_shot, summeval_instruction_contrast),
+    "hanna": {summeval_instruction_zero_shot, summeval_instruction_contrast}
+}
