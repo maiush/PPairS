@@ -1,9 +1,9 @@
-LICENSE
 README.md
 pyproject.toml
 src/PPairS/__init__.py
 src/PPairS/prompts.py
 src/PPairS/sort.py
+src/PPairS/utils.py
 src/PPairS.egg-info/PKG-INFO
 src/PPairS.egg-info/SOURCES.txt
 src/PPairS.egg-info/dependency_links.txt
@@ -18,14 +18,3 @@ src/dev/benchmarks/process_data.py
 src/dev/benchmarks/prompts_subset.py
 src/dev/benchmarks/results.py
 src/dev/benchmarks/score.py
-src/dev/climatex/classifier.py
-src/dev/climatex/embeddings.py
-src/dev/climatex/harvest.py
-src/dev/climatex/insert.py
-src/dev/climatex/parsepdf.py
-src/dev/climatex/prompts.py
-src/dev/sciencefeedback/build_prompts.py
-src/dev/sciencefeedback/compare.py
-src/dev/sciencefeedback/contrast.py
-src/dev/sciencefeedback/score.py
-src/dev/sciencefeedback/scrape.py

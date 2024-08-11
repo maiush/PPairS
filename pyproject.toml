@@ -4,10 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PPairS"
-version = "1.0.0"
+version = "2.0.0"
 description = "Pairwise Preference Search with Linear Probing"
 authors = [{name = "Sharan Maiya", email = "sm2783@cam.ac.uk"}]
-license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -21,11 +20,6 @@ dependencies = [
     "accelerate>=0.31.0",
     "jaxtyping>=0.2.28",
     "transformers>=4.42.3",
-    "pypdf>=4.2.0",
-    "nltk>=3.8.1",
-    "bertopic>=0.16.2",
-    "umap>=0.1.1",
-    "beautifulsoup4>=4.12.3",
     "dill>=0.3.8",
 ]
 classifiers = [

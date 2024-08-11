@@ -1,42 +1,13 @@
 Metadata-Version: 2.1
 Name: PPairS
-Version: 1.0.0
+Version: 2.0.0
 Summary: Pairwise Preference Search with Linear Probing
 Author-email: Sharan Maiya <sm2783@cam.ac.uk>
-License: MIT License
-        
-        Copyright (c) 2024 Sharan Maiya
-        
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-        
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-        
 Classifier: Operating System :: OS Independent
 Classifier: License :: OSI Approved :: MIT License
-Classifier: Programming Language :: Python :: 3.6
-Classifier: Programming Language :: Python :: 3.7
-Classifier: Programming Language :: Python :: 3.8
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
 Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.12
 Description-Content-Type: text/markdown
-License-File: LICENSE
 Requires-Dist: numpy>=1.26.4
 Requires-Dist: pandas>=2.2.1
 Requires-Dist: scipy>=1.13.0
@@ -47,63 +18,9 @@ Requires-Dist: torch>=2.3.0
 Requires-Dist: accelerate>=0.31.0
 Requires-Dist: jaxtyping>=0.2.28
 Requires-Dist: transformers>=4.42.3
-Requires-Dist: pypdf>=4.2.0
-Requires-Dist: nltk>=3.8.1
-Requires-Dist: bertopic>=0.16.2
-Requires-Dist: umap>=0.1.1
-Requires-Dist: beautifulsoup4>=4.12.3
 Requires-Dist: dill>=0.3.8
 
 # PPairS: Pairwise Preference Search with Linear Probing
-
-[![DOI](https://zenodo.org/badge/777825592.svg)](TODO) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-This repository implements PPairS, introduced in [**Aligning Language Model Evaluators with Human Judgement**](TODO), a dissertation submitted for the degree of *Master of Research in Environmental Data Science*.
-
-## Overview
-
-Large Language Models (LLM's) are capable automatic evaluators, highly suited for problems in which large datasets of text samples are evaluated on a numerical or Likert scale e.g., scoring factual accuracy or the quality of generated natural language. However, LLM's are still sensitive to prompt design and exhibit biases in such a way that their judgements may be *misaligned* with human assessments. <a href="https://github.com/cambridgeltl/PairS">Pairwise Preference Search</a> (PairS) is a search method designed to exploit LLMs' capabilities at conducting pairwise comparisons instead, in order to partially circumvent the issues with direct-scoring methods, however this approach still relies heavily on prompt design. As an alternative, we make use of concept-based interpretability methods and introduce **Pairwise Preference Search with Linear Probing** (PPairS), which further develops PairS through the construction of contrast pair embeddings and the use of linear probing to directly align an evaluator with human assessments. PPairS achieves state-of-the-art performance on text evaluation tasks and domain-specific problems of fact-checking and uncertainty estimation. Furthermore, it reduces the financial and computational constraints on automatic evaluation using LLM's, as it allows for peformance competitive with frontier, proprietary models using cheaper, smaller, open-weights models.
-
-## Repo Structure
-
-```
-PPairS/
-├── src/           
-│    ├── dev
-│    │    ├── benchmarks/       # text evaluation benchmarks - Experiment 1
-│    │    ├── sciencefeedback/  # fact checking - Experiment 2
-│    │    └── climatex/         # assessing expert confidence in climate science - Experiment 3
-│    └── PPairS                 # core of PPairS - including prompt templates and sorting  
-├── README.md                   # project overview and instructions
-├── pyproject.toml              # config file for the PPairS package
-└── thesis.pdf                  # mres dissertation introducing this work
-```
-
-## Data
-
-TODO
-
-## Installation and Usage
-
-TODO
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Citation
-
-```
-@misc{maiya2024ppairs,
-  author       = {Sharan Maiya},
-  title        = {{Pairwise Preference Search with Linear Probing (PPairS)}},
-  year         = 2024,
-  institution  = {University of Cambridge},
-  howpublished = {\url{https://github.com/maiush/PPairS}}
-}
-```
 
 ## Funding
 
@@ -111,7 +28,7 @@ This work was support by the [UKRI Centre for Doctoral Training in Application o
 
 ## Contact
 
-For any queries or information, contact [Sharan Maiya](maito:sm2783@cam.ac.uk).
+For any queries or information, contact [Sharan Maiya](mailto:sm2783@cam.ac.uk).
 
 ---
 
