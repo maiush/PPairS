@@ -9,17 +9,17 @@ newsroom_descriptions = {
 
 newsroom_instruction_zero_shot = """\
 Consider the following article and summary:
-Article: {ARTICLE}
-Summary: {SUMMARY}
+Article: {CONTEXT}
+Summary: {ITEM}
 {DESCRIPTION} Rate the {ASPECT} of this summary from 1 to 5, where 1 represents very low {ASPECT}, \
 and 5 represents excellent {ASPECT}. Responses must be a single score."""
 
 newsroom_instruction_contrast = """\
 Consider the following article:
-Article: {ARTICLE}
+Article: {CONTEXT}
 Below are two summaries of the above article:
-Summary 1: {SUMMARY1}
-Summary 2: {SUMMARY2}
+Summary 1: {ITEM1}
+Summary 2: {ITEM2}
 {DESCRIPTION} Which summary is more {ASPECT}? Responses must be a single choice."""
 
 # SummEval
@@ -33,17 +33,17 @@ summeval_descriptions = {
 
 summeval_instruction_zero_shot = """\
 Consider the following source and summary:
-Source: {ARTICLE}
-Summary: {SUMMARY}
+Source: {CONTEXT}
+Summary: {ITEM}
 {DESCRIPTION} Rate the {ASPECT} of this summary from 1 to 5, where 1 represents very low {ASPECT}, \
 and 5 represents excellent {ASPECT}. Responses must be a single score."""
 
 summeval_instruction_contrast = """\
 Consider the following source:
-Source: {ARTICLE}
+Source: {CONTEXT}
 Below are two summaries of the above source:
-Summary 1: {SUMMARY1}
-Summary 2: {SUMMARY2}
+Summary 1: {ITEM1}
+Summary 2: {ITEM2}
 {DESCRIPTION} Which summary is more {ASPECT}? Responses must be a single choice."""
 
 # HANNA
@@ -59,17 +59,17 @@ hanna_descriptions = {
 
 hanna_instruction_zero_shot = """\
 Consider the following prompt and story:
-Prompt: {PROMPT}
-Story: {STORY}
+Prompt: {CONTEXT}
+Story: {ITEM}
 {DESCRIPTION} Rate the {ASPECT} of this story from 1 to 5, where 1 represents very low {ASPECT}, \
 and 5 represents excellent {ASPECT}. Responses must be a single score."""
 
 hanna_instruction_contrast = """\
 Consider the following prompt:
-Prompt: {PROMPT}
+Prompt: {CONTEXT}
 Below are two stories inspired by the above prompt:
-Story 1: {STORY1}
-Story 2: {STORY2}
+Story 1: {ITEM1}
+Story 2: {ITEM2}
 {DESCRIPTION} Which story is more {ASPECT}? Responses must be a single choice."""
 
 
@@ -83,5 +83,5 @@ descriptions = {
 instructions = {
     "newsroom": (newsroom_instruction_zero_shot, newsroom_instruction_contrast),
     "summeval": (summeval_instruction_zero_shot, summeval_instruction_contrast),
-    "hanna": {summeval_instruction_zero_shot, summeval_instruction_contrast}
+    "hanna": (hanna_instruction_zero_shot, hanna_instruction_contrast)
 }
