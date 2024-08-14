@@ -25,12 +25,14 @@ class PPairSLMPipeline:
     def __call__(
             self,
             messages: List[Dict[str, str]],
+            verbose: bool=False,
             **kwargs
     ) -> Union[Float[Tensor, "n_seq n_vocab"], Float[Tensor, "d_model"]]:
         # apply chat template
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         # if necessary, allow for continuation instead of QA
         prompt = self.check_continue(messages, prompt)
+        if verbose: print(f"PROMPT\n{prompt}")
         # tokenize
         tks = self.tokenizer(prompt, return_tensors="pt", add_special_tokens=False).to(self.model.device)
         # return logits or residual stream, depending on mode
