@@ -62,8 +62,8 @@ if mode == "zero_shot":
         prompt = [
             {"role": "user", "content": data.at[i, aspect]}
         ]
-        x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
-        answer, x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
+        answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
+        x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
         results.append(x)
         answers.append(answer)
 elif mode == "compare":
@@ -72,8 +72,8 @@ elif mode == "compare":
         prompt = [
             {"role": "user", "content": data.at[i, aspect]}
         ]
-        x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
-        answer, x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
+        answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
+        x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
         results.append(x)
         answers.append(answer)
 elif mode == "contrast":
