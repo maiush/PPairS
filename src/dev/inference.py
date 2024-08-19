@@ -64,7 +64,7 @@ if mode == "zero_shot":
         ]
         answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
         x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
-        results.append(x)
+        results.append(x.cpu())
         answers.append(answer)
 elif mode == "compare":
     data = pd.read_json(f"{data_path}/{dataset}_prompts_compare.jsonl", orient="records", lines=True)
@@ -74,7 +74,7 @@ elif mode == "compare":
         ]
         answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
         x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
-        results.append(x)
+        results.append(x.cpu())
         answers.append(answer)
 elif mode == "contrast":
     data = pd.read_json(f"{data_path}/{dataset}_prompts_compare.jsonl", orient="records", lines=True)
@@ -84,7 +84,7 @@ elif mode == "contrast":
             {"role": "assistant", "content": f"{answer_template.format(ITEM=item_name, ASPECT=aspect)}{choice}"}
         ]
         x = pipeline(prompt)
-        results.append(x)
+        results.append(x.cpu())
 
 
 # save results
