@@ -26,11 +26,11 @@ class PPairSLMPipeline:
         self.mode = mode
         if mode == "zero_shot":
             print(f"zero-shot. returning generations and processed logits.")
-            self.logit_ids = [tokenizer.encode(str(i), return_tensors="pt", add_special_tokens=False).item() for i in range(1, 6)]
+            self.logit_ids = [tokenizer.encode(str(i), return_tensors="pt", add_special_tokens=False).flatten()[-1].item() for i in range(1, 6)]
             assert len(self.logit_ids) == 5
         elif mode == "compare":
             print(f"pairwise comparisons. returning generations and processed logits.")
-            self.logit_ids = [tokenizer.encode(str(i), return_tensors="pt", add_special_tokens=False).item() for i in [1, 2]]
+            self.logit_ids = [tokenizer.encode(str(i), return_tensors="pt", add_special_tokens=False).flatten()[-1].item() for i in [1, 2]]
             assert len(self.logit_ids) == 2
         elif mode == "contrast":
             print(f"contrast. returning harvested activations.")
