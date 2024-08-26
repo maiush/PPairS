@@ -16,21 +16,18 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 
 # main parameters
-mode = sys.argv[1]
-assert mode in ["zero_shot", "compare", "contrast"]
-model_name, dataset, aspect = sys.argv[2:5]
+mode, model_name, dataset, aspect = sys.argv[1:5]
 outpath = f"{results_path}/{dataset}/{model_name}"
 Path(outpath).mkdir(exist_ok=True, parents=True)
 outpath += f"/{aspect}_{mode}"
 if mode == "contrast":
-    answer_template = """Between {ITEM} 1 and {ITEM} 2, the more {ASPECT} choice is {ITEM} """
     choice = sys.argv[5]
     outpath += f"_{choice}"
+else: max_new_tokens = 32
 if os.path.exists(f"{outpath}.pt"):
     print("results already exist")
     sys.exit(0)
 
-max_new_tokens=128
 item_names = {
     "newsroom": "summary",
     "summeval": "summary",
@@ -60,7 +57,8 @@ if mode == "zero_shot":
     data = pd.read_json(f"{data_path}/{dataset}_prompts_zero_shot.jsonl", orient="records", lines=True)
     for i in trange(len(data)):
         prompt = [
-            {"role": "user", "content": data.at[i, aspect]}
+            {"role": "user", "content": data.at[i, aspect]},
+            {"role": "assistant", "content": f"I would rate the {aspect} of this {item_name} as a "}
         ]
         answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
         x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
@@ -70,7 +68,8 @@ elif mode == "compare":
     data = pd.read_json(f"{data_path}/{dataset}_prompts_compare.jsonl", orient="records", lines=True)
     for i in trange(len(data)):
         prompt = [
-            {"role": "user", "content": data.at[i, aspect]}
+            {"role": "user", "content": data.at[i, aspect]},
+            {"role": "assistant", "content": f"Between {item_name} 1 and {item_name} 2, the more {aspect} choice is {item_name} "}
         ]
         answer, x = pipeline(prompt, verbose=False, max_new_tokens=max_new_tokens)
         x = F.pad(x, (0, 0, 0, max_new_tokens-len(x)), mode="constant", value=-1)
@@ -81,7 +80,7 @@ elif mode == "contrast":
     for i in trange(len(data)):
         prompt = [
             {"role": "user", "content": data.at[i, aspect]},
-            {"role": "assistant", "content": f"{answer_template.format(ITEM=item_name, ASPECT=aspect)}{choice}"}
+            {"role": "assistant", "content": f"Between {item_name} 1 and {item_name} 2, the more {aspect} choice is {item_name} {choice}"}
         ]
         x = pipeline(prompt)
         results.append(x.cpu())
