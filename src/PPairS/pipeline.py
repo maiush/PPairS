@@ -85,5 +85,9 @@ class PPairSLMPipeline:
         '''
         if messages[-1]["role"] != "assistant": return prompt
         message = messages[-1]["content"]
+        space = message[-1] == " "
+        if space: message = message[:-1]
         ix = prompt.rindex(message) + len(message)
-        return prompt[:ix]
+        prompt = prompt[:ix]
+        if space: prompt = prompt + " "
+        return prompt
