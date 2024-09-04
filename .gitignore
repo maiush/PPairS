@@ -3,4 +3,4 @@
 *.pickle
 *.pkl
 data/
-src/dev/constants.py
+src/PPairS/constants.py

@@ -4,7 +4,7 @@ from tqdm import trange
 import pandas as pd
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-from dev.constants import llm_cache, data_path, results_path
+from PPairS.constants import llm_cache, data_path, results_path
 from PPairS.utils import models
 from PPairS.pipeline import PPairSLMPipeline
 

@@ -1,4 +1,4 @@
-from dev.constants import data_path
+from PPairS.constants import data_path
 from PPairS.prompts import descriptions
 
 import pandas as pd

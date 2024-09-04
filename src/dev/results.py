@@ -1,4 +1,4 @@
-from dev.constants import home_path, data_path, results_path, collated_results_path
+from PPairS.constants import home_path, data_path, results_path, collated_results_path
 from PPairS.utils import dataset_aspects, models
 
 import os
