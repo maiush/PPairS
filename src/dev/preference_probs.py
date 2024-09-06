@@ -2,7 +2,7 @@ from PPairS.constants import data_path, collated_results_path
 from PPairS.utils import models, dataset_aspects
 import numpy as np
 import pandas as pd
-from sklearn.metrics import cohen_kappa_score as kappa
+from sklearn.metrics import f1_score as f1
 
 
 def scores2comparisons(
@@ -53,14 +53,14 @@ for dataset in ["newsroom", "summeval", "hanna"]:
             else: return -1
         pairwise_comparisons = model_comparisons.map(p2class)
         direct_scoring = scores2comparisons(true_scores, true_comparisons, model_scores)
-        kappa_pc, kappa_ds = [], []
+        f1_pc, f1_ds = [], []
         for aspect in aspects:
-            kappa_pc.append(kappa(pd.to_numeric(true_comparisons[aspect]), pd.to_numeric(pairwise_comparisons[aspect]), labels=[1, 2, -1]))
-            kappa_ds.append(kappa(pd.to_numeric(true_comparisons[aspect]), pd.to_numeric(direct_scoring[aspect]), labels=[1, 2, -1]))
-        results.loc[len(results)] = [model, "direct_scoring"] + kappa_ds
-        results.loc[len(results)] = [model, "pairwise_comparisons"] + kappa_pc
-    results["avg_kappa"] = results[aspects].mean(axis=1)
-    results.sort_values(by=["avg_kappa"], ascending=False).to_json(
+            f1_pc.append(f1(pd.to_numeric(true_comparisons[aspect]), pd.to_numeric(pairwise_comparisons[aspect]), labels=[1, 2, -1], average="weighted"))
+            f1_ds.append(f1(pd.to_numeric(true_comparisons[aspect]), pd.to_numeric(direct_scoring[aspect]), labels=[1, 2, -1], average="weighted"))
+        results.loc[len(results)] = [model, "direct_scoring"] + f1_ds
+        results.loc[len(results)] = [model, "pairwise_comparisons"] + f1_pc
+    results["avg_f1"] = results[aspects].mean(axis=1)
+    results.sort_values(by=["avg_f1"], ascending=False).to_json(
         f"{collated_results_path}/{dataset}/baseline_results.jsonl",
         orient="records",
         lines=True
