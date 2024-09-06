@@ -52,7 +52,7 @@ for dataset in ["newsroom", "summeval", "hanna"]:
             # g-eval method (weighted average of possible scores)
             zs = zs * t.arange(start=1, end=6, dtype=zs.dtype, device=zs.device)[None, :].repeat(zs.shape[0], 1)
             zs = t.round(zs.sum(dim=1))
-            data[aspect] = zs
+            data[aspect] = zs.float()
         data.to_json(outpath, orient="records", lines=True)
 
 # pairwise comparisons
