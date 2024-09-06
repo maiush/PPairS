@@ -30,6 +30,30 @@ for dataset in ["newsroom", "summeval", "hanna"]:
             data[aspect] = zs
         data.to_json(outpath, orient="records", lines=True)
 
+# g-eval: https://arxiv.org/pdf/2303.16634
+for dataset in ["newsroom", "summeval", "hanna"]:
+    data = pd.read_json(f"{data_path}/{dataset}.jsonl", orient="records", lines=True)
+    aspects = dataset_aspects[dataset]
+    data = data[aspects]
+    for model in models.keys():
+        outpath = f"{collated_results_path}/{dataset}/{model}"
+        Path(outpath).mkdir(exist_ok=True, parents=True)
+        outpath += f"/geval.jsonl"
+        if os.path.exists(outpath): continue
+        for aspect in aspects:
+            # n_data, n_seq, n_logit (n_score)
+            zs = t.load(f"{results_path}/{dataset}/{model}/{aspect}_zero_shot.pt", weights_only=True)
+            # calculate the total probability of each possible score
+            # this is sum(P(x_i == score) for all i)
+            zs = F.softmax(zs, dim=-1)
+            zs = t.nan_to_num(zs).sum(dim=1)
+            # normalise
+            zs = F.softmax(zs, dim=-1)
+            # g-eval method (weighted average of possible scores)
+            zs = zs * t.arange(start=1, end=6, dtype=zs.dtype, device=zs.device)[None, :].repeat(zs.shape[0], 1)
+            zs = t.round(zs.sum(dim=1))
+            data[aspect] = zs
+        data.to_json(outpath, orient="records", lines=True)
 
 # pairwise comparisons
 for dataset in ["newsroom", "summeval", "hanna"]:
