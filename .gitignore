@@ -3,4 +3,5 @@
 *.pickle
 *.pkl
 data/
+src/PPairS/sandbox/
 src/PPairS/constants.py

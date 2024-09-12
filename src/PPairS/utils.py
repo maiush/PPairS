@@ -26,5 +26,5 @@ models = {
 dataset_aspects = {
     "newsroom": ["coherence", "fluency", "informativeness", "relevance"],
     "summeval": ["coherence", "consistency", "fluency", "relevance"],
-    "hanna": ["coherence", "complexity", "empathy", "engagement", "relevance"]
+    "hanna": ["coherence", "complexity", "empathy", "engagement", "relevance", "surprise"]
 }

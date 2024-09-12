@@ -13,7 +13,7 @@ src/PPairS.egg-info/dependency_links.txt
 src/PPairS.egg-info/requires.txt
 src/PPairS.egg-info/top_level.txt
 src/dev/__init__.py
+src/dev/baseline_pref_probs.py
 src/dev/build_prompts.py
 src/dev/pairwise_comparisons.py
-src/dev/preference_probs.py
 src/dev/results.py
