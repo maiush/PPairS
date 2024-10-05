@@ -3,5 +3,6 @@
 *.pickle
 *.pkl
 data/
+slurm/
 src/PPairS/sandbox/
 src/PPairS/constants.py
