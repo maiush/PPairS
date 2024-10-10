@@ -73,7 +73,7 @@ Story 2: {ITEM2}
 {DESCRIPTION} Which story is more {ASPECT}? Responses must be a single choice."""
 
 
-# compiling all prompts into dictionaries for easy access
+# compiling all above prompts into dictionaries for easy access
 
 descriptions = {
     "newsroom": newsroom_descriptions,
@@ -85,3 +85,14 @@ instructions = {
     "summeval": (summeval_instruction_zero_shot, summeval_instruction_contrast),
     "hanna": (hanna_instruction_zero_shot, hanna_instruction_contrast)
 }
+
+
+# ROCStories: slightly different format to the above - problem is already set up as pairwise comparisons 
+
+rocstories_instruction = """\
+Consider the follwing short story:
+Story: {STORY}
+Below are two statements:
+Statement 1: {STATEMENT1}
+Statement 2: {STATEMENT2}
+Considering the context of the above story, which statement is true? Responses must be a single choice."""
