@@ -1,80 +1,111 @@
-import os, sys
+import os
 from pathlib import Path
 from tqdm import trange
-import pandas as pd
+from typing import Optional, Tuple, List, Union
+from jaxtyping import Float
 
-HF_TOKEN = os.environ.get("HF_TOKEN")
-from PPairS.constants import llm_cache, data_path, results_path
+HF_TOKEN = os.environ.get('HF_TOKEN')
+from PPairS.constants import llm_cache, results_path
 from PPairS.utils import models
 from PPairS.pipeline import PPairSLMPipeline
+from PPairS.data import PPairSDataset
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch as t
+from torch import Tensor
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
 
-# main parameters
-mode, model_name, dataset, aspect = sys.argv[1:5]
-outpath = f"{results_path}/{dataset}/{model_name}"
-Path(outpath).mkdir(exist_ok=True, parents=True)
-outpath += f"/{aspect}_{mode}"
-if mode == "contrast":
-    choice = sys.argv[5]
-    outpath += f"_{choice}"
-item_names = {
-    "newsroom": "summary",
-    "summeval": "summary",
-    "hanna": "story"
-}
-item_name = item_names[dataset]
+def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
+    # load model and tokenizer
+    model = AutoModelForCausalLM.from_pretrained(
+        models[model_name],
+        torch_dtype=t.bfloat16,
+        device_map="auto",
+        cache_dir=llm_cache,
+        trust_remote_code=True
+    )
+    tokenizer = AutoTokenizer.from_pretrained(
+        models[model_name],
+        cache_dir=llm_cache
+    )
+    return model, tokenizer
 
-# load data
-if mode == "zero_shot":
-    data = pd.read_json(f"{data_path}/{dataset}_prompts_zero_shot.jsonl", orient="records", lines=True)
-else:
-    data = pd.read_json(f"{data_path}/{dataset}_prompts_compare.jsonl", orient="records", lines=True)
-# check for completed / partial runs
-if os.path.exists(f"{outpath}.pt"):
-    results = t.load(f"{outpath}.pt", weights_only=True)
-    results = [x for x in results]
-    if len(results) == len(data):
-        print("results already exist")
-        sys.exit(0)
-else:
-    results = []
+def run_pipeline(
+        outpath: str,
+        model: AutoModelForCausalLM,
+        tokenizer: AutoTokenizer,
+        mode: str,
+        dataset: PPairSDataset,
+        results: Optional[List[Union[Float[Tensor, '1 n_vocab'], Float[Tensor, 'd_model']]]]=None
+) -> None:
+    zero_shot_options = dataset.get_zero_shot_options()
+    compare_options = dataset.get_compare_options()
+    pipeline = PPairSLMPipeline(model, tokenizer, mode, zero_shot_options, compare_options, verbose=True)
+    for i in trange(len(results), dataset.length):
+        prompt = dataset.get_prompt(i)
+        x = pipeline(prompt).squeeze()
+        results.append(x.cpu())
+        t.save(t.stack(results, dim=0), f'{outpath}.pt')
 
-# load model and tokenizer
-model = AutoModelForCausalLM.from_pretrained(
-    models[model_name],
-    torch_dtype=t.bfloat16,
-    device_map="auto",
-    cache_dir=llm_cache,
-    trust_remote_code=True
-)
-tokenizer = AutoTokenizer.from_pretrained(
-    models[model_name],
-    cache_dir=llm_cache
-)
+def inference(
+        mode: str,
+        model: str,
+        dataset: str,
+        aspect: Optional[str]=None,
+        choice: Optional[str]=None
+) -> None:
+    # results directory path
+    outpath = f'{results_path}/{dataset}/{model}'
+    Path(outpath).mkdir(exist_ok=True, parents=True)
+    # results file path
+    if aspect is not None: outpath += f'/{aspect}_'
+    outpath += f'{mode}'
+    if mode == 'contrast': outpath += f'_{choice}'
+    # load dataset
+    dataset = PPairSDataset(dataset, mode=mode, aspect=aspect, choice=choice)
+    # check for completed / partial runs
+    if os.path.exists(f'{outpath}.pt'):
+        results = t.load(f'{outpath}.pt', weights_only=True)
+        results = [x for x in results]
+        if len(results) == dataset.length:
+            print('results already exist')
+            return
+    else: results = []
+    # load model and tokenizer
+    m, t = load_model_and_tokenizer(model)
+    # run pipeline
+    run_pipeline(
+        outpath,
+        m,
+        t,
+        mode,
+        dataset,
+        results
+    )
+    
 
-# inference
-pipeline = PPairSLMPipeline(model, tokenizer, mode)
-for i in trange(len(results), len(data)):    
-    if mode == "zero_shot":
-        prompt = [
-            {"role": "user", "content": data.at[i, aspect]},
-            {"role": "assistant", "content": f"I would rate the {aspect} of this {item_name} as a "}
-        ]
-    elif mode == "compare":
-        prompt = [
-            {"role": "user", "content": data.at[i, aspect]},
-            {"role": "assistant", "content": f"Between {item_name} 1 and {item_name} 2, the more {aspect} choice is {item_name} "}
-        ]
-    elif mode == "contrast":
-        prompt = [
-            {"role": "user", "content": data.at[i, aspect]},
-            {"role": "assistant", "content": f"Between {item_name} 1 and {item_name} 2, the more {aspect} choice is {item_name} {choice}"}
-        ]
-    x = pipeline(prompt).squeeze()
-    results.append(x.cpu())
-t.save(t.stack(results, dim=0), f"{outpath}.pt")
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-mode', type=str, choices=['zero_shot', 'compare', 'contrast'], required=True)
+    parser.add_argument('-model', type=str, choices=list(models.keys()), required=True)
+    parser.add_argument('-dataset', type=str, choices=['newsroom', 'summeval', 'hanna', 'rocstories'], required=True)
+    parser.add_argument('-aspect', type=str, required=False)
+    parser.add_argument('-choice', type=str, required=False)
+    args = parser.parse_args()
+
+    # argument checks
+    if args.dataset in ['newsroom', 'summeval', 'hanna']:
+        assert args.aspect is not None
+    if args.mode == 'contrast':
+        assert args.choice is not None
+
+    inference(
+        mode=args.mode,
+        model=args.model,
+        dataset=args.dataset,
+        aspect=args.aspect,
+        choice=args.choice
+    )
