@@ -1,3 +1,5 @@
+# prompts for newsroom, summeval, and hanna datasets
+
 from PPairS.constants import data_path
 from PPairS.prompts import descriptions, instructions
 
