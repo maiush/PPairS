@@ -54,8 +54,7 @@ class PPairSDataset:
         else: prompts_path += 'compare'
         prompts_path += '.jsonl'
         self.data = pd.read_json(prompts_path, orient='records', lines=True)
-        # self.length = len(self.data)
-        self.length = 5 # TODO: remove
+        self.length = len(self.data)
 
     def get_user_prompt(self, idx: int) -> str:
         return self.data.at[idx, self.aspect]

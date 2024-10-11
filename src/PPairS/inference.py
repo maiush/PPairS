@@ -42,7 +42,7 @@ def run_pipeline(
 ) -> None:
     zero_shot_options = dataset.get_zero_shot_options()
     compare_options = dataset.get_compare_options()
-    pipeline = PPairSLMPipeline(model, tokenizer, mode, zero_shot_options, compare_options, verbose=True)
+    pipeline = PPairSLMPipeline(model, tokenizer, mode, zero_shot_options, compare_options)
     for i in trange(len(results), dataset.length):
         prompt = dataset.get_prompt(i)
         x = pipeline(prompt).squeeze()

@@ -95,4 +95,4 @@ Story: {STORY}
 Below are two statements:
 Statement 1: {STATEMENT1}
 Statement 2: {STATEMENT2}
-Considering the context of the above story, which statement is true? Responses must be a single choice."""
+Considering the context of the above story, which statement is more consistent? Responses must be a single choice."""
