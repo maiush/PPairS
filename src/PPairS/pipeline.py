@@ -57,7 +57,7 @@ class PPairSLMPipeline:
         with t.inference_mode(): 
             if self.mode in ['zero_shot', 'compare']:
                 out = self.model.generate(
-                    tks.input_ids,
+                    **tks,
                     max_new_tokens=1,
                     return_dict_in_generate=True,
                     output_scores=True,

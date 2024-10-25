@@ -85,8 +85,8 @@ class PPairSDataset:
         return prompt
     
     def get_zero_shot_options(self) -> List[str]:
-        assert self.name in self.scoring_datasets
-        out = None if self.mode != 'zero_shot' else [str(i) for i in range(1, 6)]
+        out = None
+        if self.mode == 'zero_shot' and self.name in self.scoring_datasets: out = [str(i) for i in range(1, 6)]
         return out             
     
     def get_compare_options(self) -> List[str]:

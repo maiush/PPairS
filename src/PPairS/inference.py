@@ -47,7 +47,9 @@ def run_pipeline(
         prompt = dataset.get_prompt(i)
         x = pipeline(prompt).squeeze()
         results.append(x.cpu())
-        t.save(t.stack(results, dim=0), f'{outpath}.pt')
+        # backups
+        if i % 10 == 0: t.save(t.stack(results, dim=0), f'{outpath}.pt')
+    t.save(t.stack(results, dim=0), f'{outpath}.pt')
 
 def inference(
         mode: str,
@@ -74,12 +76,12 @@ def inference(
             return
     else: results = []
     # load model and tokenizer
-    m, t = load_model_and_tokenizer(model)
+    mo, to = load_model_and_tokenizer(model)
     # run pipeline
     run_pipeline(
         outpath,
-        m,
-        t,
+        mo,
+        to,
         mode,
         dataset,
         results
