@@ -4,9 +4,10 @@ import pandas as pd
 
 
 data = pd.read_json(f'{data_path}/rocstories.jsonl', orient='records', lines=True)
-def compare_prompt(row: pd.Series) -> str:
+def compare_prompt(row: pd.Series, reverse: bool=False) -> str:
     story = row['story']
-    s1, s2 = row['statement1'], row['statement2']
+    if reverse: s1, s2 = row['statement2'], row['statement1']
+    else: s1, s2 = row['statement1'], row['statement2']
     prompt = rocstories_instruction.format(
         STORY=story,
         STATEMENT1=s1,
@@ -18,3 +19,7 @@ def compare_prompt(row: pd.Series) -> str:
 prompts = pd.DataFrame(columns=['consistency'])
 prompts['consistency'] = data.apply(compare_prompt, axis=1)
 prompts.to_json(f"{data_path}/rocstories_prompts_compare.jsonl", orient="records", lines=True)
+
+# reverse comparisons for calibration
+prompts['consistency'] = data.apply(lambda row: compare_prompt(row, True), axis=1)
+prompts.to_json(f"{data_path}/rocstories_prompts_compare_reversed.jsonl", orient="records", lines=True)

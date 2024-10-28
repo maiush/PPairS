@@ -39,14 +39,17 @@ def compare(
         aspect: str,
         dataset: str,
         context_name: str,
-        item_name: str
+        item_name: str,
+        reverse: bool=False
 ) -> str:
     template = instructions[dataset][1]
     description = descriptions[dataset][aspect]
+    if reverse: i1, i2 = row[f"{item_name}2"], row[f"{item_name}1"]
+    else: i1, i2 = row[f"{item_name}1"], row[f"{item_name}2"]
     prompt = template.format(
         CONTEXT=row[context_name],
-        ITEM1=row[f"{item_name}1"],
-        ITEM2=row[f"{item_name}2"],
+        ITEM1=i1,
+        ITEM2=i2,
         DESCRIPTION=description,
         ASPECT=aspect
     )
@@ -81,3 +84,20 @@ for dataset in ["newsroom", "summeval", "hanna"]:
             ), axis=1
         )
     data.to_json(f"{data_path}/{dataset}_prompts_compare.jsonl", orient="records", lines=True)
+
+
+# reverse pairwise comparisons (for calibration)
+for dataset in ["newsroom", "summeval", "hanna"]:
+    data = pd.read_json(f"{data_path}/{dataset}_pairwise_comparisons.jsonl", orient="records", lines=True)
+    for aspect in list(descriptions[dataset].keys()):
+        data[aspect] = data.apply(
+            lambda row: compare(
+                row,
+                aspect,
+                dataset,
+                context_names[dataset],
+                item_names[dataset],
+                reverse=True
+            ), axis=1
+        )
+    data.to_json(f"{data_path}/{dataset}_prompts_compare_reversed.jsonl", orient="records", lines=True)
