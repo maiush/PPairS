@@ -34,7 +34,8 @@ class PPairSDataset:
             name: str,
             mode: str,
             aspect: Optional[str]=None,
-            choice: Optional[str]=None
+            choice: Optional[str]=None,
+            reversed: Optional[str]=None
     ) -> None:
         assert name in self.all_datasets
         self.name = name
@@ -50,8 +51,11 @@ class PPairSDataset:
         self.choice = choice
 
         prompts_path = f'{data_path}/{name}_prompts_'
-        if mode == 'zero_shot': prompts_path += 'zero_shot'
-        else: prompts_path += 'compare'
+        if mode == 'zero_shot': 
+            prompts_path += 'zero_shot'
+        else: 
+            prompts_path += 'compare'
+            prompts_path += '_reversed' if reversed == 'True' else ''
         prompts_path += '.jsonl'
         self.data = pd.read_json(prompts_path, orient='records', lines=True)
         self.length = len(self.data)

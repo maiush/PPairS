@@ -32,6 +32,9 @@ def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, Aut
     )
     return model, tokenizer
 
+def oom_culprit(mode: str, dataset: PPairSDataset, idx: int) -> bool:
+    return (mode == 'contrast') & (dataset.name == 'newsroom') & (idx in range(1197, 1218))
+
 def run_pipeline(
         outpath: str,
         model: AutoModelForCausalLM,
@@ -44,8 +47,12 @@ def run_pipeline(
     compare_options = dataset.get_compare_options()
     pipeline = PPairSLMPipeline(model, tokenizer, mode, zero_shot_options, compare_options)
     for i in trange(len(results), dataset.length):
-        prompt = dataset.get_prompt(i)
-        x = pipeline(prompt).squeeze()
+        # silly temporary bug fix
+        if oom_culprit(mode, dataset, i):
+            x = t.zeros_like(results[-1])
+        else:
+            prompt = dataset.get_prompt(i)
+            x = pipeline(prompt).squeeze()
         results.append(x.cpu())
         # backups
         if i % 10 == 0: t.save(t.stack(results, dim=0), f'{outpath}.pt')
@@ -56,7 +63,8 @@ def inference(
         model: str,
         dataset: str,
         aspect: Optional[str]=None,
-        choice: Optional[str]=None
+        choice: Optional[str]=None,
+        reversed: Optional[str]=None
 ) -> None:
     # results directory path
     outpath = f'{results_path}/{dataset}/{model}'
@@ -65,8 +73,9 @@ def inference(
     if aspect is not None: outpath += f'/{aspect}_'
     outpath += f'{mode}'
     if mode == 'contrast': outpath += f'_{choice}'
+    if reversed == 'True': outpath += f'_reversed'
     # load dataset
-    dataset = PPairSDataset(dataset, mode=mode, aspect=aspect, choice=choice)
+    dataset = PPairSDataset(dataset, mode=mode, aspect=aspect, choice=choice, reversed=reversed)
     # check for completed / partial runs
     if os.path.exists(f'{outpath}.pt'):
         results = t.load(f'{outpath}.pt', weights_only=True)
@@ -96,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('-dataset', type=str, choices=['newsroom', 'summeval', 'hanna', 'rocstories'], required=True)
     parser.add_argument('-aspect', type=str, required=False)
     parser.add_argument('-choice', type=str, required=False)
+    parser.add_argument('-reversed', type=str, required=False)
     args = parser.parse_args()
 
     # argument checks
@@ -109,5 +119,6 @@ if __name__ == '__main__':
         model=args.model,
         dataset=args.dataset,
         aspect=args.aspect,
-        choice=args.choice
+        choice=args.choice,
+        reversed=args.reversed
     )
