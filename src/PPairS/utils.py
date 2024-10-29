@@ -1,9 +1,9 @@
 # NOTE: all models are instruction-tuned
 models = {
     # mistral
-    'mistral-large-123b': 'mistralai/Mistral-Large-Instruct-2407', 
-    'mistral-small-22b': 'mistralai/Mistral-Small-Instruct-2409',
-    'mistral-nemo-12b': 'mistralai/Mistral-Nemo-Instruct-2407', 
+    # 'mistral-large-123b': 'mistralai/Mistral-Large-Instruct-2407', 
+    # 'mistral-small-22b': 'mistralai/Mistral-Small-Instruct-2409',
+    # 'mistral-nemo-12b': 'mistralai/Mistral-Nemo-Instruct-2407', 
      
     # llama
     'llama-3.1-70b': 'meta-llama/Meta-Llama-3.1-70B-Instruct',
