@@ -24,6 +24,13 @@ models = {
     'qwen-2.5-0.5b': 'Qwen/Qwen2.5-0.5B-Instruct',
 }
 
+families = {
+    'qwen': [f'qwen-2.5-{size}b' for size in ['0.5', '1.5', '3', '7', '14', '32', '72']],
+    'gemma': [f'gemma-2-{size}b' for size in ['2', '9', '27']],
+    'llama': [f'llama-3.1-{size}b' for size in ['8', '70']],
+    'mistral': ['mistral-nemo-12b', 'mistral-small-22b', 'mistral-large-123b']
+}
+
 # NLG datasets are evaluated on specific aspects
 dataset_aspects = {
     'newsroom': ['coherence', 'fluency', 'informativeness', 'relevance'],

@@ -24,7 +24,7 @@ def pc_results(dataset: str) -> None:
             # logits to probs
             pc, pc_r = F.softmax(pc, dim=-1), F.softmax(pc_r, dim=-1)
             # calibrate
-            probs = (pc + pc_r) / 2
+            probs = (pc + (1 - pc_r)) / 2
             # we want an actual preference probability
             # we just store P(choice == 1)
             data[aspect] = probs[:, 0].float()

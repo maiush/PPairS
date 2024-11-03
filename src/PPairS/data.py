@@ -67,11 +67,11 @@ class PPairSDataset:
         item = self.items[self.name]
         if self.mode == 'zero_shot':
             assert self.name in self.scoring_datasets
-            content = f'I would rate the {self.aspect} of this {item} as a '
+            content = f'I would rate the {self.aspect} of this {item} as a'
             return content
         else:
             aspect = self.aspects_noun2adj[self.aspect]
-            content = f'Between {item} 1 and {item} 2, the more {aspect} choice is {item} '
+            content = f'Between {item} 1 and {item} 2, the more {aspect} choice is {item}'
             if self.mode == 'contrast':
                 content += self.choice
             return content
