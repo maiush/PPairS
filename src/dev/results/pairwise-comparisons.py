@@ -1,4 +1,4 @@
-from PPairS.constants import data_path, results_path, collated_results_path
+from PPairS.constants import results_path, collated_results_path
 from PPairS.utils import dataset_aspects, models
 
 import os
@@ -10,8 +10,7 @@ import torch.nn.functional as F
 
 def pc_results(dataset: str) -> None:
     aspects = dataset_aspects[dataset]
-    data = pd.read_json(f"{data_path}/{dataset}_pairwise_comparisons.jsonl", orient="records", lines=True)
-    data = data[aspects]
+    data = pd.DataFrame(columns=aspects)
     for model in models.keys():
         outpath = f"{collated_results_path}/{dataset}/{model}"
         Path(outpath).mkdir(exist_ok=True, parents=True)
@@ -33,7 +32,5 @@ def pc_results(dataset: str) -> None:
 
 
 if __name__ == '__main__':
-    for dataset in ["newsroom", "summeval", "hanna"]:
+    for dataset in ["newsroom", "summeval", "hanna", "rocstories"]:
         pc_results(dataset)
-
-    # TODO: rocstories
