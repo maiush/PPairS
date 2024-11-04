@@ -27,7 +27,8 @@ class PPairSDataset:
 
     scoring_datasets = ['newsroom', 'summeval', 'hanna']
     comparison_datasets = ['rocstories']
-    all_datasets = scoring_datasets + comparison_datasets
+    grounding_datasets = ['caters', 'mctaco']
+    all_datasets = scoring_datasets + comparison_datasets + grounding_datasets
 
     def __init__(
             self,
@@ -61,20 +62,25 @@ class PPairSDataset:
         self.length = len(self.data)
 
     def get_user_prompt(self, idx: int) -> str:
-        return self.data.at[idx, self.aspect]
+        if self.name in self.grounding_datasets: return self.data.at[idx, 'prompt']
+        else: return self.data.at[idx, self.aspect]
     
     def get_assistant_prompt(self) -> str:
-        item = self.items[self.name]
+        if self.name not in self.grounding_datasets: item = self.items[self.name]
         if self.mode == 'zero_shot':
             assert self.name in self.scoring_datasets
-            content = f'I would rate the {self.aspect} of this {item} as a'
+            content = f'I would rate the {self.aspect} of this {item} as a '
             return content
+        elif self.name == 'caters':
+            content = 'Between statement 1 and statement 2, the statement which appears before the other is statement '
+        elif self.name == 'mctaco':
+            content = 'Between choice 1 and choice 2, the more sensible option is choice '
         else:
             aspect = self.aspects_noun2adj[self.aspect]
-            content = f'Between {item} 1 and {item} 2, the more {aspect} choice is {item}'
-            if self.mode == 'contrast':
-                content += self.choice
-            return content
+            content = f'Between {item} 1 and {item} 2, the more {aspect} choice is {item} '
+        if self.mode == 'contrast':
+            content += self.choice
+        return content
         
     def get_prompt(self, idx: int) -> List[Dict[str, str]]:
         user_prompt = {

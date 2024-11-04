@@ -67,10 +67,10 @@ def inference(
         reversed: Optional[str]=None
 ) -> None:
     # results directory path
-    outpath = f'{results_path}/{dataset}/{model}'
+    outpath = f'{results_path}/{dataset}/{model}/'
     Path(outpath).mkdir(exist_ok=True, parents=True)
     # results file path
-    if aspect is not None: outpath += f'/{aspect}_'
+    if aspect is not None: outpath += f'{aspect}_'
     outpath += f'{mode}'
     if mode == 'contrast': outpath += f'_{choice}'
     if reversed == 'True': outpath += f'_reversed'
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-mode', type=str, choices=['zero_shot', 'compare', 'contrast'], required=True)
     parser.add_argument('-model', type=str, choices=list(models.keys()), required=True)
-    parser.add_argument('-dataset', type=str, choices=['newsroom', 'summeval', 'hanna', 'rocstories'], required=True)
+    parser.add_argument('-dataset', type=str, choices=['newsroom', 'summeval', 'hanna', 'rocstories', 'caters', 'mctaco'], required=True)
     parser.add_argument('-aspect', type=str, required=False)
     parser.add_argument('-choice', type=str, required=False)
     parser.add_argument('-reversed', type=str, required=False)
