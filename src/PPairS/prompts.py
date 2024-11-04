@@ -90,9 +90,32 @@ instructions = {
 # ROCStories: slightly different format to the above - problem is already set up as pairwise comparisons 
 
 rocstories_instruction = """\
-Consider the follwing short story:
+Consider the following short story:
 Story: {STORY}
 Below are two statements:
 Statement 1: {STATEMENT1}
 Statement 2: {STATEMENT2}
 Considering the context of the above story, which statement is more consistent? Responses must be a single choice."""
+
+
+# CaTeRS
+
+caters_instruction = """\
+The following list of statements form a story, however they are unordered:
+Unordered Statements: {UNORDERED}
+Below are two statements from this list:
+Statement 1: {STATEMENT1}
+Statement 2: {STATEMENT2}
+Determine the correct order of the above statements - which statement appears before the other? Responses must be a single choice."""
+
+
+# MC-TACO
+
+mctaco_instruction = """\
+Consider the following passage:
+Passage: {PASSAGE}
+Below is a question regarding the above passage:
+Question: {QUESTION}
+Choice 1: {CHOICE1}
+Choice 2: {CHOICE2}
+Which answer is more sensible? Responses must be a single choice."""
