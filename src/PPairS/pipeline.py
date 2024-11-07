@@ -93,5 +93,5 @@ class PPairSLMPipeline:
         ix = prompt.rindex(message) + len(message)
         prompt = prompt[:ix]
         # add the space back in necessary
-        if space: prompt = prompt + " "
+        if space: prompt = prompt + ' '
         return prompt
