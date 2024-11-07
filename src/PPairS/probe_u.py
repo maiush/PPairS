@@ -11,12 +11,15 @@ from PPairS.utils import models, dataset_aspects
 
 from tqdm import tqdm
 
+scoring_datasets = ['newsroom', 'summeval', 'hanna']
+comparison_datasets = ['rocstories']
+grounding_datasets = ['caters', 'mctaco']
 
 def fit_probes(dataset: str) -> None:
-    aspects = dataset_aspects[dataset]
+    if dataset in scoring_datasets+comparison_datasets: aspects = dataset_aspects[dataset]
+    else: aspects = ['f1']
     label_path = f'{data_path}/{dataset}'
-    if dataset in ['newsroom', 'summeval', 'hanna']:
-        label_path += '_pairwise_comparisons'
+    if dataset in scoring_datasets+grounding_datasets: label_path += '_pairwise_comparisons'
     label_path += '.jsonl'
     data = pd.read_json(label_path, orient='records', lines=True)
     results = pd.DataFrame(columns=['model']+aspects)
@@ -24,7 +27,9 @@ def fit_probes(dataset: str) -> None:
         scores, feats = [], []
         for aspect in aspects:
             # load contrast pair activations
-            act_path = f"{results_path}/{dataset}/{model}/{aspect}_contrast"
+            act_path = f"{results_path}/{dataset}/{model}/"
+            if dataset in scoring_datasets+comparison_datasets: act_path += f'{aspect}_'
+            act_path += 'contrast'
             x1 = t.load(f"{act_path}_1.pt", weights_only=True).float()
             x2 = t.load(f"{act_path}_2.pt", weights_only=True).float()
             # centering
@@ -33,7 +38,12 @@ def fit_probes(dataset: str) -> None:
             # contrast pair differences
             x = x1 - x2
             # labels
-            c = 'correct' if dataset == 'rocstories' else aspect
+            if dataset == 'rocstories' or dataset == 'mctaco':
+                c = 'correct'
+            elif dataset == 'caters':
+                c = 'first'
+            else:
+                c = aspect
             y = t.tensor(data[c], dtype=int)
             # mask out equal pairs
             mask = y != -1
@@ -62,8 +72,12 @@ def fit_probes(dataset: str) -> None:
         Path(feats_path).mkdir(parents=True, exist_ok=True)
         t.save(feats, f"{feats_path}/probe_u.pt")
         results.loc[len(results)] = [model] + scores
-    results["avg_f1"] = results[aspects].mean(axis=1)
-    results.sort_values(by=["avg_f1"], ascending=False).to_json(
+    if len(aspects) > 1:
+        sortcol = 'avg_f1'
+        results["avg_f1"] = results[aspects].mean(axis=1)
+    else:
+        sortcol = 'f1'
+    results.sort_values(by=[sortcol], ascending=False).to_json(
         f"{collated_results_path}/{dataset}/probe_u_results.jsonl",
         orient="records",
         lines=True
