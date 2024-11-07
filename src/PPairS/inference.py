@@ -18,13 +18,15 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
 
 def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
+    use_cache = False if model_name.startswith('gemma') else True
     # load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
         models[model_name],
         torch_dtype=t.bfloat16,
         device_map="auto",
         cache_dir=llm_cache,
-        trust_remote_code=True
+        trust_remote_code=True,
+        use_cache=use_cache
     )
     tokenizer = AutoTokenizer.from_pretrained(
         models[model_name],
