@@ -69,7 +69,7 @@ class PPairSLMPipeline:
                 free_mem([tks, out, logits])
                 return scores
             elif self.mode == 'contrast':
-                out = self.model(tks.input_ids, output_hidden_states=True)
+                out = self.model(**tks, output_hidden_states=True)
                 # grab the residual stream after the last block
                 activations = out['hidden_states'][-1].squeeze(0)[-1, :]
                 free_mem([tks, out])

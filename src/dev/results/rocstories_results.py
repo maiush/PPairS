@@ -1,5 +1,5 @@
 from PPairS.constants import data_path, collated_results_path
-from PPairS.utils import models, dataset_aspects
+from PPairS.utils import models
 import pandas as pd
 from sklearn.metrics import f1_score as f1
 
