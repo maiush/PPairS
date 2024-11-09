@@ -6,7 +6,7 @@ from transformers import AutoTokenizer
 
 from PPairS.constants import data_path
 
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 from tqdm import trange
 
 
@@ -40,6 +40,7 @@ class PPairSDataset:
             self,
             name: str,
             mode: str,
+            split: Optional[Union[int, float]]=None,
             aspect: Optional[str]=None,
             choice: Optional[str]=None,
             reversed: Optional[str]=None,
@@ -63,9 +64,13 @@ class PPairSDataset:
             prompts_path += 'zero_shot'
         else: 
             prompts_path += 'compare'
-            prompts_path += '_reversed' if reversed == 'True' else ''
+            if reversed and not peft:
+                prompts_path += '_reversed' if reversed == 'True' else ''
         prompts_path += '.jsonl'
         self.data = pd.read_json(prompts_path, orient='records', lines=True)
+        if split is not None:
+            if 0 <= split <= 1: self.data = self.data.iloc[:int(split*len(self.data))]
+            else: self.data = self.data.iloc[:split]
         self.length = len(self.data)
         # load labels if we're performing fine-tuning
         self.peft = peft
@@ -79,6 +84,15 @@ class PPairSDataset:
             elif name == 'caters': c = 'first'
             else: c = aspect
             self.label_column = c
+            if reversed and mode == 'compare':
+                rev_prompts_path = prompts_path.replace('.jsonl', '_reversed.jsonl')
+                rev_data = pd.read_json(rev_prompts_path, orient='records', lines=True)
+                if split is not None:
+                    if 0 <= split <= 1: rev_data = rev_data.iloc[:int(split*len(rev_data))]
+                    else: rev_data = rev_data.iloc[:split]
+                self.data = pd.concat([self.data, rev_data]).reset_index(drop=True)
+                self.length = len(self.data)
+
 
     def get_user_prompt(self, idx: int) -> str:
         if self.name in self.grounding_datasets: return self.data.at[idx, 'prompt']
@@ -134,6 +148,8 @@ class PPairSPEFTDataset(Dataset):
             tokenizer: AutoTokenizer,
             max_length: int=4096
     ) -> None:
+        # set pad token (eos token default)
+        tokenizer.pad_token = tokenizer.eos_token
         self.examples = []
         for idx in trange(dataset.length, desc='preparing data'):
             messages = dataset.get_prompt(idx)

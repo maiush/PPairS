@@ -1,7 +1,9 @@
 import gc
 import torch as t
 from torch import Tensor
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+from peft import get_peft_model, LoraConfig, TaskType, prepare_model_for_kbit_training
+from PPairS.data import PPairSPEFTDataset
 from jaxtyping import Float
 from typing import Optional, Union, List, Dict, Iterable
 
@@ -95,3 +97,61 @@ class PPairSLMPipeline:
         # add the space back in necessary
         if space: prompt = prompt + ' '
         return prompt
+    
+
+class PPairSPEFTPipeline:
+
+    def __init__(
+            self,
+            model: AutoModelForCausalLM,
+            rank: int=8,
+            alpha: int=16,
+            dropout: float=0.1
+    ) -> None:
+        self.model = model
+        # define lora config
+        lora_config = LoraConfig(
+            r=rank,
+            lora_alpha=alpha,
+            target_modules=['q_proj', 'v_proj'],
+            lora_dropout=dropout,
+            bias='none',
+            task_type=TaskType.CAUSAL_LM
+        )
+        # prep model for lora
+        self.model = prepare_model_for_kbit_training(self.model)
+        self.model = get_peft_model(self.model, lora_config)
+
+    def train(
+            self,
+            train_dataset: PPairSPEFTDataset,
+            val_dataset: PPairSPEFTDataset,
+            output_dir: str,
+            n_epoch: int=10,
+            n_batch: int=16,
+            n_save: int=100,
+            n_eval: int=100,
+            n_log: int=10,
+            lr: float=2e-4
+    ) -> None:
+        args = TrainingArguments(
+            output_dir=output_dir,
+            num_train_epochs=n_epoch,
+            per_device_train_batch_size=1,
+            per_device_eval_batch_size=1,
+            gradient_accumulation_steps=n_batch,
+            save_steps=n_save,
+            eval_steps=n_eval,
+            save_total_limit=1,
+            logging_steps=n_log,
+            learning_rate=lr,
+            fp16=True,
+            eval_strategy='steps',
+        )
+        trainer = Trainer(
+            model=self.model,
+            args=args,
+            train_dataset=train_dataset,
+            eval_dataset=val_dataset
+        )
+        trainer.train()
