@@ -43,7 +43,7 @@ def run_pipeline(
         tokenizer: AutoTokenizer,
         mode: str,
         dataset: PPairSDataset,
-        results: Optional[List[Union[Float[Tensor, '1 n_vocab'], Float[Tensor, 'd_model']]]]=None
+        results: List[Union[Float[Tensor, '1 n_vocab'], Float[Tensor, 'd_model']]]
 ) -> None:
     zero_shot_options = dataset.get_zero_shot_options()
     compare_options = dataset.get_compare_options()

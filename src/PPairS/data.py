@@ -75,11 +75,7 @@ class PPairSDataset:
         # load labels if we're performing fine-tuning
         self.peft = peft
         if peft:
-            labels_path = f'{data_path}/{name}'
-            if name != 'rocstories' and mode != 'zero_shot':
-                labels_path += '_pairwise_comparisons'
-            labels_path += '.jsonl'
-            self.labels = pd.read_json(labels_path, orient='records', lines=True)
+            self.load_labels()
             if name == 'rocstories' or name == 'mctaco': c = 'correct'
             elif name == 'caters': c = 'first'
             else: c = aspect
@@ -93,6 +89,12 @@ class PPairSDataset:
                 self.data = pd.concat([self.data, rev_data]).reset_index(drop=True)
                 self.length = len(self.data)
 
+    def load_labels(self) -> None:
+        labels_path = f'{data_path}/{self.name}'
+        if self.name != 'rocstories' and self.mode != 'zero_shot':
+            labels_path += '_pairwise_comparisons'
+        labels_path += '.jsonl'
+        self.labels = pd.read_json(labels_path, orient='records', lines=True)
 
     def get_user_prompt(self, idx: int) -> str:
         if self.name in self.grounding_datasets: return self.data.at[idx, 'prompt']
