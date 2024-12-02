@@ -4,14 +4,9 @@ from torch import Tensor
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
 from peft import get_peft_model, LoraConfig, TaskType, prepare_model_for_kbit_training
 from PPairS.data import PPairSPEFTDataset
+from PPairS.utils import free_mem
 from jaxtyping import Float
 from typing import Optional, Union, List, Dict, Iterable
-
-
-def free_mem(vars):
-    for v in vars: del v
-    gc.collect()
-    t.cuda.empty_cache()
 
 
 class PPairSLMPipeline:

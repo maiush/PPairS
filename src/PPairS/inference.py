@@ -14,8 +14,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch as t
 from torch import Tensor
 
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
-
 
 def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
     use_cache = False if model_name.startswith('gemma') else True
@@ -100,6 +98,8 @@ def inference(
     
 
 if __name__ == '__main__':
+    os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-mode', type=str, choices=['zero_shot', 'compare', 'contrast'], required=True)

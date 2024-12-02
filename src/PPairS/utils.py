@@ -1,3 +1,8 @@
+import gc
+import torch as t
+from typing import Any, Iterable
+
+
 # NOTE: all models are instruction-tuned
 models = {
     # mistral
@@ -38,3 +43,11 @@ dataset_aspects = {
     'hanna': ['coherence', 'complexity', 'empathy', 'engagement', 'relevance', 'surprise'],
     'rocstories': ['consistency']
 }
+
+def free_mem(vars: Iterable[Any]):
+    for v in vars:
+        if hasattr(v, 'cuda'): v.cuda.empty_cache()
+        del v
+    t.cuda.synchronize()
+    gc.collect()
+    t.cuda.empty_cache()

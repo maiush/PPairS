@@ -1,11 +1,12 @@
-import os, gc, pickle
+import os, subprocess, pickle
+from pathlib import Path
 
 import torch as t
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
 from PPairS.constants import llm_cache, peft_path
-from PPairS.utils import models
+from PPairS.utils import models, free_mem
 from PPairS.data import PPairSDataset, PPairSPEFTDataset
 from PPairS.pipeline import PPairSPEFTPipeline
 from PPairS.inference import run_pipeline
@@ -13,13 +14,7 @@ from PPairS.inference import run_pipeline
 from typing import Union, Optional, Tuple
 
 HF_TOKEN = os.environ.get('HF_TOKEN')
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
-
-def free_mem(vars):
-    for v in vars: del v
-    gc.collect()
-    t.cuda.empty_cache()
 
 def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
     use_cache = False if model_name.startswith('gemma') else True
@@ -36,6 +31,11 @@ def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, Aut
         models[model_name],
         cache_dir=llm_cache
     )
+    # try gradient checkpointing and flash-attn
+    try: model.gradient_checkpointing_enable() 
+    except: print('could not enable gradient checkpointing')
+    try: model.config.use_flash_attention = True    
+    except: print('could not enable flash attn')
     return model, tokenizer
 
 def train_lora(
@@ -55,8 +55,14 @@ def train_lora(
     # check for existing results
     checkpoints = [f for f in os.listdir(outpath) if f.startswith('checkpoint')]
     if len(checkpoints) > 0:
-        print(f'existing checkpoints: remove if you wish to retrain')
-        return
+        if os.path.exists(f'{outpath}/eval.pt'):
+            print(f'existing results: remove if you wish to retrain')
+            return
+        else:
+            # we have partially completed results and need to start again
+            command = f'rm -rf {outpath}'
+            subprocess.run(command, shell=True)
+            Path(outpath).mkdir(exist_ok=True, parents=True)        
     reversed = True if reversed == 'True' else False
     # load prompt dataset
     data = PPairSDataset(
@@ -108,8 +114,9 @@ def train_lora(
 
 
 if __name__ == '__main__':
+    os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+
     import argparse, hashlib
-    from pathlib import Path
     def parse_split(value: Union[int, float]) -> Union[int, float]:
         try:
             float_val = float(value)
