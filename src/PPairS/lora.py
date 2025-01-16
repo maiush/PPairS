@@ -16,24 +16,23 @@ from typing import Union, Optional, Tuple
 HF_TOKEN = os.environ.get('HF_TOKEN')
 
 
-def load_model_and_tokenizer(model_name: str) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
-    use_cache = False if model_name.startswith('gemma') else True
+def load_model_and_tokenizer(model_name: str, peft: bool=False) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
     # load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
         models[model_name],
         torch_dtype=t.bfloat16,
         device_map="auto",
         cache_dir=llm_cache,
-        trust_remote_code=True,
-        use_cache=use_cache
+        trust_remote_code=True
     )
     tokenizer = AutoTokenizer.from_pretrained(
         models[model_name],
         cache_dir=llm_cache
     )
     # try gradient checkpointing and flash-attn
-    try: model.gradient_checkpointing_enable() 
-    except: print('could not enable gradient checkpointing')
+    if peft:
+        try: model.gradient_checkpointing_enable() 
+        except: print('could not enable gradient checkpointing')
     try: model.config.use_flash_attention = True    
     except: print('could not enable flash attn')
     return model, tokenizer
@@ -53,63 +52,81 @@ def train_lora(
         reversed: Optional[str]=None
 ) -> None:
     # check for existing results
-    checkpoints = [f for f in os.listdir(outpath) if f.startswith('checkpoint')]
-    if len(checkpoints) > 0:
-        if os.path.exists(f'{outpath}/eval.pt'):
-            print(f'existing results: remove if you wish to retrain')
-            return
-        else:
-            # we have partially completed results and need to start again
-            command = f'rm -rf {outpath}'
-            subprocess.run(command, shell=True)
-            Path(outpath).mkdir(exist_ok=True, parents=True)        
-    reversed = True if reversed == 'True' else False
-    # load prompt dataset
-    data = PPairSDataset(
-        name=dataset,
-        mode=mode,
-        split=split,
-        aspect=aspect,
-        reversed=reversed,
-        peft=True
-    )
-    # load model and tokenizer
-    mod, tok = load_model_and_tokenizer(model)
-    # prepare for peft
-    train_data = PPairSPEFTDataset(data, tok)
-    # prepare pipeline for training
-    pipeline = PPairSPEFTPipeline(mod, rank=rank, alpha=alpha, dropout=dropout)
-    # fit lora
-    print('training lora')
-    pipeline.train(
-        train_data, 
-        train_data,
-        output_dir=outpath,
-        n_epoch=epoch,
-        lr=lr
-    )
-    # cleanup, before running evaluation
-    free_mem([data, train_data, pipeline])
-    # apply lora
+    eval_files_exist = os.path.exists(f'{outpath}/eval.pt') or os.path.exists(f'{outpath}/eval_reversed.pt')
+    if not eval_files_exist:
+        # if we didn't finish training the LoRA we need to start again
+        command = f'rm -rf {outpath}'
+        subprocess.run(command, shell=True)
+        Path(outpath).mkdir(exist_ok=True, parents=True)        
+        reversed = True if reversed == 'True' else False
+        # load prompt dataset
+        data = PPairSDataset(
+            name=dataset,
+            mode=mode,
+            split=split,
+            aspect=aspect,
+            reversed=reversed,
+            peft=True
+        )
+        # load model and tokenizer
+        mod, tok = load_model_and_tokenizer(model, peft=True)
+        # prepare for peft
+        train_data = PPairSPEFTDataset(data, tok)
+        # prepare pipeline for training
+        pipeline = PPairSPEFTPipeline(mod, rank=rank, alpha=alpha, dropout=dropout)
+        # fit lora
+        print('training lora')
+        pipeline.train(
+            train_data, 
+            output_dir=outpath,
+            n_epoch=epoch,
+            lr=lr
+        )
+        # cleanup, before running evaluation
+        free_mem([mod, tok, data, train_data, pipeline])
     print('evaluating')
-    checkpoint = [f for f in os.listdir(outpath) if f.startswith('checkpoint')][0]
-    mod = PeftModel.from_pretrained(
-        model=mod,
-        model_id=f'{outpath}/{checkpoint}',
-        device_map='auto',
-        is_trainable=False
-    )
     # run evaluation
     if mode == 'compare':
         for reversed in [True, False]:
             eval_path = f'{outpath}/eval'
             if reversed: eval_path += '_reversed'
             data = PPairSDataset(dataset, mode=mode, aspect=aspect, reversed=reversed)
-            run_pipeline(eval_path, mod, tok, mode, data, [])
+            # check for existing results
+            if os.path.exists(f'{eval_path}.pt'):
+                results = t.load(f'{eval_path}.pt', weights_only=True)
+                results = [x for x in results]
+            else: results = []
+            if len(results) < data.length:
+                # load model and tokenizer
+                mod, tok = load_model_and_tokenizer(model, peft=False)
+                # apply lora
+                checkpoint = [f for f in os.listdir(outpath) if f.startswith('checkpoint')][0]
+                mod = PeftModel.from_pretrained(
+                    model=mod,
+                    model_id=f'{outpath}/{checkpoint}',
+                    device_map='auto',
+                    is_trainable=False
+                )
+                run_pipeline(eval_path, mod, tok, mode, data, results)
     else:
         # zero shot
         data = PPairSDataset(dataset, mode=mode, aspect=aspect)
-        run_pipeline(f'{outpath}/eval', mod, tok, mode, data, [])
+        if os.path.exists(f'{eval_path}.pt'):
+            results = t.load(f'{eval_path}.pt', weights_only=True)
+            results = [x for x in results]
+        else: results = []
+        if len(results) < data.length:
+            # load model and tokenizer
+            mod, tok = load_model_and_tokenizer(model, peft=False)
+            # apply lora
+            checkpoint = [f for f in os.listdir(outpath) if f.startswith('checkpoint')][0]
+            mod = PeftModel.from_pretrained(
+                model=mod,
+                model_id=f'{outpath}/{checkpoint}',
+                device_map='auto',
+                is_trainable=False
+            )
+            run_pipeline(f'{outpath}/eval', mod, tok, mode, data, results)
     print('done')
 
 
