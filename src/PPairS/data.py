@@ -43,7 +43,7 @@ class PPairSDataset:
             split: Optional[Union[int, float]]=None,
             aspect: Optional[str]=None,
             choice: Optional[str]=None,
-            reversed: Optional[str]=None,
+            reversed: Optional[Union[bool, str]]=None,
             peft: Optional[bool]=False
     ) -> None:
         assert name in self.all_datasets
@@ -64,8 +64,8 @@ class PPairSDataset:
             prompts_path += 'zero_shot'
         else: 
             prompts_path += 'compare'
-            if reversed and not peft:
-                prompts_path += '_reversed' if reversed == 'True' else ''
+            if isinstance(reversed, str): reversed = eval(reversed)
+            if reversed: prompts_path += '_reversed' if reversed else ''
         prompts_path += '.jsonl'
         self.data = pd.read_json(prompts_path, orient='records', lines=True)
         if split is not None:
@@ -80,13 +80,20 @@ class PPairSDataset:
             elif name == 'caters': c = 'first'
             else: c = aspect
             self.label_column = c
-            if reversed and mode == 'compare':
+            if mode == 'compare':
+                # we want to fine-tune on both the original and reversed comparisons
+                prompts_path = f'{data_path}/{name}_prompts_compare.jsonl'
                 rev_prompts_path = prompts_path.replace('.jsonl', '_reversed.jsonl')
+                data = pd.read_json(prompts_path, orient='records', lines=True)
                 rev_data = pd.read_json(rev_prompts_path, orient='records', lines=True)
                 if split is not None:
-                    if 0 <= split <= 1: rev_data = rev_data.iloc[:int(split*len(rev_data))]
-                    else: rev_data = rev_data.iloc[:split]
-                self.data = pd.concat([self.data, rev_data]).reset_index(drop=True)
+                    if 0 <= split <= 1:
+                        data = data.iloc[:int(split*len(data))]
+                        rev_data = rev_data.iloc[:int(split*len(rev_data))]
+                    else:
+                        data = data.iloc[:split]
+                        rev_data = rev_data.iloc[:split]
+                self.data = pd.concat([data, rev_data]).reset_index(drop=True)
                 self.length = len(self.data)
 
     def load_labels(self) -> None:
