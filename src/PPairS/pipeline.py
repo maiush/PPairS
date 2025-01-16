@@ -120,13 +120,10 @@ class PPairSPEFTPipeline:
     def train(
             self,
             train_dataset: PPairSPEFTDataset,
-            val_dataset: PPairSPEFTDataset,
             output_dir: str,
             n_epoch: int=10,
             n_batch: int=16,
             n_save: int=100,
-            n_eval: int=100,
-            n_log: int=10,
             lr: float=2e-4
     ) -> None:
         args = TrainingArguments(
@@ -136,17 +133,15 @@ class PPairSPEFTPipeline:
             per_device_eval_batch_size=1,
             gradient_accumulation_steps=n_batch,
             save_steps=n_save,
-            eval_steps=n_eval,
             save_total_limit=1,
-            logging_steps=n_log,
+            logging_strategy='no',
             learning_rate=lr,
             fp16=True,
-            eval_strategy='steps',
+            eval_strategy='no',
         )
         trainer = Trainer(
             model=self.model,
             args=args,
-            train_dataset=train_dataset,
-            eval_dataset=val_dataset
+            train_dataset=train_dataset
         )
         trainer.train()
