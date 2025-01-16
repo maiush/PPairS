@@ -45,9 +45,7 @@ dataset_aspects = {
 }
 
 def free_mem(vars: Iterable[Any]):
-    for v in vars:
-        if hasattr(v, 'cuda'): v.cuda.empty_cache()
-        del v
+    for v in vars: del v
     t.cuda.synchronize()
     gc.collect()
     t.cuda.empty_cache()
