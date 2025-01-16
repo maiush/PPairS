@@ -76,7 +76,7 @@ def fit_probes(dataset: str) -> None:
         sortcol = 'avg_f1'
         results["avg_f1"] = results[aspects].mean(axis=1)
     else:
-        sortcol = 'f1'
+        sortcol = aspects[0]
     results.sort_values(by=[sortcol], ascending=False).to_json(
         f"{collated_results_path}/{dataset}/probe_u_results.jsonl",
         orient="records",
@@ -87,7 +87,7 @@ def fit_probes(dataset: str) -> None:
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-dataset', type=str, required=True)
+    parser.add_argument('--dataset', type=str, required=True)
     args = parser.parse_args()
 
     fit_probes(args.dataset)
